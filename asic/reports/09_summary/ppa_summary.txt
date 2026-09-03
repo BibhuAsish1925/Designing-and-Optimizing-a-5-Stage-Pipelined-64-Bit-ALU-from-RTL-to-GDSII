@@ -1,0 +1,56 @@
+64-BIT ALU - FINAL SKY130A PPA SUMMARY
+=======================================
+
+Technology:
+  PDK: Sky130A
+  Standard Cell Library: sky130_fd_sc_hd
+
+Physical:
+  Die: 250 x 250 um
+  Die Area: 62,500 um^2
+  Core Area: 53,897.9 um^2
+  Standard Cell Area: 40,188.5 um^2
+  Utilization: 74.5642%
+  Total Instances: 9,085
+  Standard Cell Instances: 4,785
+  I/O Count: 205
+
+Routing:
+  Final Wirelength: 205,089 um
+  Final Vias: 41,023
+  Route DRC Errors: 0
+  Antenna Violations: 0
+
+Power:
+  Corner: nom_tt_025C_1v80
+  Voltage: 1.8 V
+  Temperature: 25 C
+  Total Power: 0.701735 mW
+  Internal Power: 0.286338 mW
+  Switching Power: 0.415373 mW
+  Leakage Power: 0.0000147 mW
+
+Timing:
+  Architecture: Combinational
+  Register-to-register paths: None
+  Overall Setup WNS: -3.818343 ns
+  Overall Setup TNS: -3.943214 ns
+  Setup Violations: 5
+  Hold WNS: 0 ns violation
+  Hold TNS: 0
+  Hold Violations: 0
+
+Worst Setup Corner:
+  max_ss_100C_1v60
+  WNS: -3.818343 ns
+  Setup Violations: 3
+
+Physical Signoff:
+  Magic DRC: 0
+  KLayout DRC: 0
+  LVS: 0
+  Antenna: 0
+  Power Grid Violations: 0
+
+Final Layout:
+  GDS: alu64_top.gds

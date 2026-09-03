@@ -1,0 +1,102 @@
+# ===============================================================>
+# 64-BIT ALU - LIBRELANE ASIC CONFIGURATION
+# ===============================================================>
+#
+# Sky130A implementation of the 64-bit combinational ALU.
+#
+# The RTL is a combinational datapath, therefore CLOCK_PORT remai>
+# LibreLane still uses a virtual clock for I/O timing analysis wh>
+# physical clock port exists.
+#
+# A 40 ns timing budget is used here as an implementation constra>
+# this first timing-closure iteration. It is not a claim that the>
+# ALU will operate at exactly 25 MHz.
+# ===============================================================>
+
+
+# --------------------------------------------------------------->
+# DESIGN
+# --------------------------------------------------------------->
+
+DESIGN_NAME: alu64_top
+
+
+# --------------------------------------------------------------->
+# RTL SOURCE FILES
+# --------------------------------------------------------------->
+#
+# The package is listed first because it contains shared definiti>
+# by the ALU RTL.
+# --------------------------------------------------------------->
+VERILOG_FILES:
+  - dir::src/alu64_pkg.sv
+  - dir::src/alu64_core.sv
+  - dir::src/alu64_top.sv
+
+
+# --------------------------------------------------------------->
+# PDK / STANDARD-CELL LIBRARY
+# --------------------------------------------------------------->
+
+PDK: sky130A
+
+STD_CELL_LIBRARY: sky130_fd_sc_hd
+
+
+# --------------------------------------------------------------->
+# TIMING
+# --------------------------------------------------------------->
+#
+# The ALU has no real clock input.
+#
+# CLOCK_PORT = null therefore tells LibreLane not to build a cloc>
+#
+# CLOCK_PERIOD still controls the virtual timing budget used by S>
+# 40 ns is intentionally chosen for this combinational 64-bit dat>
+# so that we can first determine whether physical timing can clos>
+# --------------------------------------------------------------->
+
+CLOCK_PORT: null
+
+CLOCK_PERIOD: 40.0
+
+
+# --------------------------------------------------------------->
+# SYNTHESIS
+# --------------------------------------------------------------->
+#
+# DELAY 4 is a timing-oriented ABC synthesis strategy.
+# We use it here because the current problem is timing rather tha>
+#
+# LibreLane provides several DELAY strategies; the best one ultim>
+# depends on the actual design and must be verified by running th>
+# --------------------------------------------------------------->
+
+SYNTH_STRATEGY: "DELAY 4"
+
+
+# --------------------------------------------------------------->
+# FLOORPLAN
+# --------------------------------------------------------------->
+#
+# Absolute sizing keeps the physical dimensions explicit.
+#
+# The previous 200 x 200 um die reached placement repair with high
+# utilization and could not be legally detailed-placed.
+#
+# The 250 x 250 um die successfully passed through placement, rou>
+# DRC, LVS and antenna checking in the previous run.
+# --------------------------------------------------------------->
+
+FP_SIZING: absolute
+
+DIE_AREA:
+  - 0
+  - 0
+  - 250
+  - 250
+
+
+# ===============================================================>
+# END OF CONFIGURATION
+# ===============================================================>

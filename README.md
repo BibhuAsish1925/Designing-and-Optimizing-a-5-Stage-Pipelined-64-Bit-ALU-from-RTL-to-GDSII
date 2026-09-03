@@ -61,6 +61,17 @@ The ALU also generates arithmetic and status information through the carry, zero
 
 The design is divided into small RTL blocks to keep the implementation easy to verify and synthesize.
 
+<table align="center">
+    <td align="center">
+      <img width="1536" height="1024" alt="circuit diagram" src="https://github.com/user-attachments/assets/a817282d-197b-4dff-a462-203e9c57eeac" /><br/>
+      <small> Fig. Complete System Architecture
+    </td>
+</table>
+
+The RTL uses combinational ALU logic with dedicated handling for arithmetic operations, logical operations, shifts, comparisons, and status-flag generation.
+
+The project is described as a pipelined ALU at the project level, while the final top-level implementation used for the Sky130A physical flow is effectively **combinational for timing analysis**, with no register-to-register timing paths. This distinction is important when interpreting the final timing results.
+
 ```text
              ┌───────────────────────┐
 operand_a ──►│                       │
@@ -71,10 +82,6 @@ carry_in ───►│   Arithmetic / Logic  │──► zero_flag
              │                       │──► overflow_flag
              └───────────────────────┘
 ```
-
-The RTL uses combinational ALU logic with dedicated handling for arithmetic operations, logical operations, shifts, comparisons, and status-flag generation.
-
-The project is described as a pipelined ALU at the project level, while the final top-level implementation used for the Sky130A physical flow is effectively **combinational for timing analysis**, with no register-to-register timing paths. This distinction is important when interpreting the final timing results.
 
 ---
 
@@ -338,11 +345,21 @@ asic/reports/08_final_layout/
 
 ### Final ASIC Layout
 
-![Final ASIC Layout](asic/layout_ss1.png)
-
+<table align="center">
+    <td align="center">
+      <img width="1105" height="857" alt="layout_ss2" src="https://github.com/user-attachments/assets/e6e4560f-28f9-4feb-b58d-8c6109152b05" /><br/>
+      <small> Fig. Final ASIC Layout
+    </td>
+</table>
+        
 ### Additional Layout View
 
-![ASIC Layout View](asic/layout_ss2.png)
+<table align="center">
+    <td align="center">
+      <img width="1917" height="1017" alt="layout_ss1" src="https://github.com/user-attachments/assets/e43d6f5b-22c6-4649-8bdd-104a0868e1f1" /><br/>
+      <small> Fig. Additional Layout View window
+    </td>
+</table>
 
 ---
 

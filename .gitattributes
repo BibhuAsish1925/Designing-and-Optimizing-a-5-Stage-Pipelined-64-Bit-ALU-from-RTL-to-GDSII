@@ -3,6 +3,5 @@
 *.tcl linguist-language=Tcl
 *.md linguist-language=Markdown
 
-# Generated ASIC netlist; keep it in the repository but exclude it
-# from the language statistics.
-alu64_top.nl.v linguist-generated=true
+# Generated Verilog/netlists
+*.v linguist-generated=true

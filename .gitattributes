@@ -1,8 +1,8 @@
 *.sv linguist-language=SystemVerilog
 *.py linguist-language=Python
 *.tcl linguist-language=Tcl
-*.yaml linguist-language=YAML
-*.yml linguist-language=YAML
+*.yaml linguist-language=others
+*.yml linguist-language=others
 *.md linguist-language=Markdown
 
 # Generated Verilog/netlists

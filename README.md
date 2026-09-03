@@ -363,27 +363,40 @@ asic/reports/08_final_layout/
 
 ---
 
-# PPA Summary
+## Final PPA & Performance Metrics
 
-| Category | Final Result |
-|---|---:|
-| **Technology** | **Sky130A** |
-| **Die Area** | **62,500 µm²** |
-| **Core Area** | **53,897.9 µm²** |
-| **Utilization** | **74.56%** |
-| **Standard Cell Area** | **40,188.5 µm²** |
-| **Total Instances** | **9,085** |
-| **Nominal ASIC Power** | **0.7017 mW** |
-| **Hold WNS** | **+16.2754 ns** |
-| **Setup WNS** | **-3.8183 ns** |
-| **Setup Violations** | **5** |
-| **Final Route Wirelength** | **205,089 µm** |
-| **DRC** | **0 errors** |
-| **LVS** | **0 errors** |
-| **Antenna** | **0 violations** |
-| **Power Grid** | **0 violations** |
-| **GDSII** | **Generated successfully** |
+The following metrics summarize the final **Sky130A post-route implementation** of the 64-bit ALU. Area, power, routing, timing, and physical sign-off results were collected from the final LibreLane/OpenROAD reports.
 
+| Metric | Result | Description / Context |
+| :--- | :--- | :--- |
+| **Architecture** | **64-bit ALU** | Combinational top-level implementation |
+| **Opcodes** | **16** | 4-bit command field |
+| **Technology** | **Sky130A** | `sky130_fd_sc_hd` standard-cell library |
+| **Die Size** | **250 × 250 µm** | Final floorplan |
+| **Die Area** | **62,500 µm²** | Final physical die area |
+| **Core Area** | **53,897.9 µm²** | Final core area |
+| **Standard Cell Area** | **40,188.5 µm²** | Synthesized standard-cell area |
+| **Total Instances** | **9,085** | Final implemented instances |
+| **Standard Cells** | **4,785** | Final standard-cell count |
+| **Cell Utilization** | **74.56%** | Final placement utilization |
+| **Nominal ASIC Power** | **0.7017 mW** | `nom_tt_025C_1v80`, post-route |
+| **Hold WNS** | **+16.2754 ns** | Hold timing margin |
+| **Hold TNS** | **0 ns** | No hold violations |
+| **Setup WNS** | **-3.8183 ns** | Worst setup slack |
+| **Setup TNS** | **-3.9432 ns** | Total setup negative slack |
+| **Setup Violations** | **5** | Timing closure not achieved |
+| **Register-to-Register Paths** | **0** | Combinational top-level design |
+| **Final Route Wirelength** | **205,089 µm** | Post-route wirelength |
+| **Route Nets** | **4,117** | Final routed nets |
+| **Route Vias** | **41,023** | Final routed vias |
+| **Antenna Violations** | **0** | After antenna repair |
+| **DRC Errors** | **0** | Final physical verification |
+| **LVS Errors** | **0** | Layout-versus-schematic verification |
+| **XOR Differences** | **0** | Layout comparison |
+| **Power Grid Violations** | **0** | Final power-grid check |
+| **GDSII** | **Generated** | Final `alu64_top.gds` |
+
+> **Note:** Unlike the reference pipelined ASIC design, this implementation does not have a meaningful operating-frequency, throughput, pipeline-latency, energy/op, or clock-tree-power figure because the final top-level design is combinational and has no register-to-register timing paths. The most relevant performance metric is therefore the **interface-based setup timing**, with a current worst-case slack of **-3.8183 ns**.
 ---
 
 # Project Structure

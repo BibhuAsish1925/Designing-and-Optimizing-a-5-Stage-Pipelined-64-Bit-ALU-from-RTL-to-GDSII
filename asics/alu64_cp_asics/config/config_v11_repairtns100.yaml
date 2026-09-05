@@ -1,0 +1,37 @@
+DESIGN_NAME: alu64_cp_top
+
+VERILOG_FILES:
+  - dir::src/alu64_cp_pkg.sv
+  - dir::src/alu64_cp_core.sv
+  - dir::src/alu64_cp_pipeline.sv
+  - dir::src/alu64_cp_top.sv
+
+PDK: sky130A
+STD_CELL_LIBRARY: sky130_fd_sc_hd
+
+CLOCK_PORT: clk
+CLOCK_PERIOD: 10.0
+
+SYNTH_STRATEGY: "DELAY 4"
+
+PNR_SDC_FILE: dir::constraints/alu64_cp_top.sdc
+SIGNOFF_SDC_FILE: dir::constraints/alu64_cp_top.sdc
+
+FP_SIZING: absolute
+
+DIE_AREA:
+  - 0
+  - 0
+  - 350
+  - 350
+
+RUN_POST_GRT_RESIZER_TIMING: true
+
+GRT_RESIZER_SETUP_MAX_BUFFER_PCT: 100
+GRT_RESIZER_SETUP_SLACK_MARGIN: 0.000
+GRT_RESIZER_SETUP_REPAIR_TNS_PCT: 100
+
+GRT_RESIZER_HOLD_MAX_BUFFER_PCT: 50
+GRT_RESIZER_HOLD_SLACK_MARGIN: 0.050
+
+GRT_RESIZER_FIX_HOLD_FIRST: false

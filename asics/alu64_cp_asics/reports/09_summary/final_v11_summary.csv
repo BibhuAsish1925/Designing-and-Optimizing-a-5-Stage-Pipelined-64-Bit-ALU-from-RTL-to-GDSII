@@ -1,0 +1,23 @@
+Metric,Value,Unit
+Architecture,5-stage pipelined 64-bit ALU,-
+RTL Version,V11,-
+Technology,Sky130A,-
+Standard Cell Library,sky130_fd_sc_hd,-
+LibreLane Run,RUN_2026-09-05_10-52-32,-
+Die Width,350,um
+Die Height,350,um
+Die Area,122500,um2
+Instance Area,110506,um2
+Utilization,47.4887,%
+Standard Cell Area,53035.9,um2
+Total Power,6.161845,mW
+Route Wirelength,217570,um
+Route Vias,38822,-
+Setup WNS,-4.811867,ns
+Setup TNS,-190.528544,ns
+Hold WNS,0,ns
+DRC,PASS,-
+LVS,PASS,-
+Antenna,PASS,-
+Power Grid Violations,0,-
+GDSII,GENERATED,-

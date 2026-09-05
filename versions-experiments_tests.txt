@@ -1,0 +1,251 @@
+**three stages of optimization history**:
+
+1. **V1 → V25 RTL experiments**
+2. **Selection of V2 / V11 / V17**
+3. **V11 physical-flow experiments → final V11**
+
+---
+
+# ALU64_CP Optimization and Experiment History
+
+## 1. RTL Optimization: V1 → V25
+
+| Version | Main change / experiment                                               | Core synth cells | Total synth cells | Sequential |     Comb. | Verification         | Physical result                  | Decision      |
+| ------- | ---------------------------------------------------------------------- | ---------------: | ----------------: | ---------: | --------: | -------------------- | -------------------------------- | ------------- |
+| **V1**  | Initial 5-stage clocked/pipelined ALU baseline                         |                — |            ~4,941 |       ~471 |    ~4,470 | PASS                 | Baseline physical implementation | Reference     |
+| **V2**  | Corrected SUB carry/borrow and conservative datapath                   |                — |         **3,762** |        471 |     3,291 | PASS                 | DRC/LVS/Antenna PASS             | **Candidate** |
+| **V3**  | Boolean/coding cleanup of V2                                           |            3,269 |         **3,762** |        471 |     3,291 | PASS                 | Not pursued physically           | Rejected      |
+| **V4**  | Parallel datapaths + separate operation selects                        |                — |             3,852 |        471 |     3,381 | PASS                 | Not pursued                      | Rejected      |
+| **V5**  | Targeted `result[63]` optimization                                     |                — |             3,852 |        471 |     3,381 | PASS                 | Critical path unchanged          | Rejected      |
+| **V6**  | Separate result-MSB logic per operation                                |                — |             3,852 |        471 |     3,381 | PASS                 | Critical path unchanged          | Rejected      |
+| **V7**  | Removed redundant `negative_flag` from core                            |            3,345 |         **3,838** |        471 |     3,367 | PASS                 | Not pursued                      | Rejected      |
+| **V8**  | Removed redundant `zero_flag` from core                                |            3,338 |         **3,831** |        471 |     3,360 | PASS                 | Not pursued                      | Rejected      |
+| **V9**  | Parallel datapath optimization                                         |                — |                 — |          — |         — | **FAIL**: 16/18 core | 183 pipeline checks failed       | **Rejected**  |
+| **V10** | Conservative V2/V3-style implementation                                |            3,309 |         **3,802** |        471 |     3,331 | PASS                 | Not pursued                      | Rejected      |
+| **V11** | Conservative single-case datapath; optimized compare/SUB/INC/DEC logic |        **3,260** |         **3,753** |        471 |     3,282 | PASS                 | Strong physical balance          | **Selected**  |
+| **V12** | Alternative conservative implementation                                |            3,311 |             3,804 |        471 |     3,333 | PASS                 | Not pursued                      | Rejected      |
+| **V13** | Boolean simplification of SUB/INC/DEC/compare                          |            3,264 |             3,757 |        471 |     3,286 | PASS                 | Not pursued                      | Rejected      |
+| **V14** | Explicit arithmetic/subtract-ext implementation                        |            3,264 |             3,757 |        471 |     3,286 | PASS                 | Not pursued                      | Rejected      |
+| **V15** | Alternative datapath restructuring                                     |            3,325 |             3,818 |        471 |     3,347 | PASS                 | Not pursued                      | Rejected      |
+| **V16** | V11-like SUB/compare formulation                                       |            3,264 |             3,757 |        471 |     3,286 | PASS                 | Not pursued                      | Rejected      |
+| **V17** | Shared `operands_equal` logic for SUB/CMP_EQ                           |        **3,228** |         **3,721** |        471 | **3,250** | PASS                 | Physically routed                | **Reference** |
+| **V18** | Explicit result[62] / shift optimization                               |            3,329 |             3,822 |        471 |     3,351 | PASS                 | Not pursued                      | Rejected      |
+| **V19** | Explicit logarithmic barrel shifter                                    |                — |                 — |          — |         — | No measured result   | No physical result               | Not pursued   |
+| **V20** | Shared bidirectional barrel shifter                                    |                — |                 — |          — |         — | No measured result   | No physical result               | Not pursued   |
+| **V21** | Separate arithmetic/logic/shift/compare datapaths                      |            3,320 |             3,813 |        471 |     3,342 | PASS                 | Not pursued                      | Rejected      |
+| **V22** | **6-stage** pipeline with registered candidate results                 |      3,465 comb. |         **4,976** |  **1,511** |     3,465 | PASS: 946/946        | **Global routing congestion**    | **Rejected**  |
+| **V23** | Returned to 5-stage; explicit result[62] shift case                    |            3,336 |             3,829 |        471 |     3,358 | PASS                 | Not pursued                      | Rejected      |
+| **V24** | Shared logarithmic barrel-shifter proposal                             |                — |                 — |          — |         — | No measured result   | No physical result               | Stopped       |
+| **V25** | One-hot opcode-decode experiment                                       |            3,279 |             3,772 |        471 |     3,301 | PASS                 | Physical result worse than V11   | Rejected      |
+
+### Verification summary
+
+The successful 5-stage versions maintained the complete verification flow:
+
+```text
+Core verification       PASS
+Pipeline verification   PASS
+Top-level verification  PASS
+Random verification     PASS
+```
+
+The randomized verification reached:
+
+```text
+Transactions generated : 1007
+Checks generated       : 1184
+Passed                 : 1184
+Failed                 : 0
+```
+
+V9 was the notable failed RTL experiment and was discarded immediately.
+
+---
+
+# 2. Selection of V2, V11 and V17
+
+After V25, rather than continuing to blindly optimize every RTL version, the three strongest candidates were compared physically.
+
+| Metric             |              **V2** |                   **V11** |                          **V17** |
+| ------------------ | ------------------: | ------------------------: | -------------------------------: |
+| Pipeline           |             5-stage |               **5-stage** |                          5-stage |
+| Synth cells        |               3,762 |                     3,753 |                        **3,721** |
+| Sequential cells   |                 471 |                       471 |                              471 |
+| Comb. cells        |               3,291 |                     3,282 |                        **3,250** |
+| Utilization        |             51.989% |               **52.878%** |                          52.493% |
+| Route WL           |          257,233 µm |                236,478 µm |                   **231,011 µm** |
+| Route vias         |              42,945 |                **42,268** |                       **41,797** |
+| TT power           |        **5.623 mW** |                  6.534 mW |                         6.599 mW |
+| Setup WNS          |           -9.352 ns |             **-6.597 ns** |                       -11.656 ns |
+| Setup TNS          |         -237.609 ns |           **-222.138 ns** |                      -329.263 ns |
+| Hold               |               Clean |                 **Clean** |                            Clean |
+| DRC                |                PASS |                  **PASS** |          Not explicitly recorded |
+| LVS                |                PASS |                  **PASS** |          Not explicitly recorded |
+| Antenna            |                PASS |                  **PASS** |          Not explicitly recorded |
+| GDSII              |                 Yes |                   **Yes** |                              Yes |
+| Overall assessment | Low-power reference | **Best physical balance** | Best synthesis/routing reference |
+
+### Candidate selection
+
+**V2**
+
+* Lowest power.
+* Good physical implementation.
+* Retained as the **low-power reference**.
+
+**V17**
+
+* Lowest synthesis cell count.
+* Lowest recorded route wirelength and vias.
+* Retained as the **synthesis/routing reference**.
+* However, timing and power were worse.
+
+**V11**
+
+* Best overall balance of timing, power, area/utilization and physical implementation.
+* Clean DRC/LVS/Antenna.
+* Clean hold timing.
+* Therefore selected as the **final RTL architecture**.
+
+> **Decision: V11 was frozen as the final 5-stage RTL implementation.**
+
+---
+
+# 3. V11 Physical Optimization Experiments
+
+Once V11 was selected, optimization moved away from blind RTL changes and toward **physical implementation and timing optimization**.
+
+The base reference was:
+
+```text
+V11_SDC_TEST
+```
+
+which established that the custom SDC was being correctly used by LibreLane.
+
+| Experiment               | Main change                                  |     Setup WNS |      Setup TNS | Hold         |        Power |       Route WL | Result                      |
+| ------------------------ | -------------------------------------------- | ------------: | -------------: | ------------ | -----------: | -------------: | --------------------------- |
+| **V11_SDC_TEST**         | Custom PNR/signoff SDC                       | **-4.994 ns** |    -207.452 ns | Clean        | **6.159 mW** |     220,068 µm | **Physical baseline**       |
+| **V11_TD**               | Timing-driven placement                      |     -4.505 ns | **-87.393 ns** | ❌ Violations |     6.345 mW |              — | Rejected                    |
+| **V11_TD + density**     | Timing-driven + `FP_CORE_UTIL=40`            |     -4.505 ns |     -87.393 ns | ❌ Violations |     6.345 mW |              — | No benefit                  |
+| **V11_TD_POSTGRT**       | Timing-driven + post-GRT timing optimization | **-4.386 ns** | **-80.048 ns** | ❌ Violations |     6.321 mW |              — | Best setup, but hold failed |
+| **V11_POSTGRT_RESIZER**  | Post-GRT resizer timing                      |     -4.812 ns |    -190.529 ns | **Clean**    | **6.162 mW** | **217,570 µm** | **Selected baseline**       |
+| **V11_POSTGRT_SETUP100** | Setup buffer budget 100%                     |     -4.764 ns |    -194.535 ns | **Clean**    |     6.160 mW | **217,025 µm** | Rejected                    |
+| **V11_POSTGRT_BUFKEEP**  | Keep setup buffers                           |             — |              — | **Clean**    |            — |              — | No clear benefit            |
+| **V11_REPAIR_TNS100**    | `GRT_RESIZER_SETUP_REPAIR_TNS_PCT=100`       |     -4.764 ns |    -194.535 ns | **Clean**    |     6.160 mW |     217,025 µm | Rejected                    |
+
+---
+
+# 4. Final V11 Selection
+
+The official frozen implementation is:
+
+```text
+RUN_2026-09-05_10-52-32
+```
+
+### Final PPA / physical results
+
+| Parameter             |        Final V11 |
+| --------------------- | ---------------: |
+| RTL                   |              V11 |
+| Architecture          | 5-stage pipeline |
+| Latency               |         5 cycles |
+| Technology            |          Sky130A |
+| Standard-cell library |  sky130_fd_sc_hd |
+| Die                   |     350 × 350 µm |
+| Die area              |      122,500 µm² |
+| Instance area         |      110,506 µm² |
+| Route wirelength      |   **217,570 µm** |
+| Route vias            |       **38,822** |
+| Total power           |    **6.1618 mW** |
+| Setup WNS             |   **-4.8119 ns** |
+| Setup TNS             | **-190.5285 ns** |
+| Hold WNS              | **0 ns / clean** |
+| DRC                   |         **PASS** |
+| LVS                   |         **PASS** |
+| Antenna               |         **PASS** |
+| Power-grid violations |            **0** |
+| GDSII                 |    **Generated** |
+
+GDSII:
+
+```text
+runs/RUN_2026-09-05_10-52-32/final/gds/alu64_cp_top.gds
+```
+
+---
+
+# 5. Final Optimization Decision
+
+For the GitHub repository, I recommend stating the conclusion like this:
+
+ ### Final Optimization Decision
+
+> The ALU64_CP design was evaluated through 25 RTL optimization versions, followed by multiple physical implementation experiments on the strongest V11 candidate.
+
+> V17 achieved the lowest synthesized cell count and lowest recorded routing wirelength, while V2 achieved the lowest power. However, V11 provided the best overall balance between synthesis size, routing, power, setup timing, hold timing, and physical signoff results.
+
+> Therefore, **V11 was frozen as the final 5-stage architecture**. Additional experiments with timing-driven placement and post-global-routing optimization produced limited timing improvements and, in some cases, introduced hold violations or worsened total negative slack.
+
+> The final V11 implementation successfully completed the RTL-to-GDSII physical flow with **DRC, LVS, antenna, power-grid and hold checks passing**. The remaining limitation is that the **10 ns setup timing target was not closed at the worst SS corner**. Further architectural exploration, particularly the 6-stage alternative, was intentionally stopped because its increased sequential hardware and routing congestion did not provide sufficient overall benefit.
+
+---
+
+## Final hierarchy for your GitHub repo
+
+I would organize the history visually as:
+
+```text
+V1
+ │
+ ├── V2 ───────────────┐
+ │                     │
+ ├── V3                │
+ ├── V4                │
+ ├── V5                │
+ ├── V6                │
+ ├── V7                │
+ ├── V8                │
+ ├── V9 ❌             │
+ ├── V10               │
+ ├── V11 ──────────────┼──► BEST 3 CANDIDATES
+ │                     │
+ ├── V12               │
+ ├── V13               │
+ ├── V14               │
+ ├── V15               │
+ ├── V16               │
+ ├── V17 ──────────────┘
+ ├── V18
+ ├── V19
+ ├── V20
+ ├── V21
+ ├── V22 ❌ 6-stage
+ ├── V23
+ ├── V24
+ └── V25
+          │
+          ▼
+    V2 / V11 / V17
+          │
+          ▼
+       **V11**
+          │
+          ├── SDC baseline
+          ├── Timing-driven placement
+          ├── Timing-driven + post-GRT
+          ├── Post-GRT resizer
+          ├── Setup100
+          ├── BufferKeep
+          └── TNS100
+                    │
+                    ▼
+          **V11 FINAL**
+    RUN_2026-09-05_10-52-32
+                    │
+                    ▼
+              alu64_cp_top.gds
+```
+
+

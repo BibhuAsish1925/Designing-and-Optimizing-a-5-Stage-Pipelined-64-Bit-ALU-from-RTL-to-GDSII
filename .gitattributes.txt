@@ -1,8 +1,0 @@
-*.sv linguist-language=SystemVerilog
-*.py linguist-language=Python
-*.tcl linguist-language=Tcl
-*.md linguist-language=Markdown
-
-# Generated ASIC netlist; keep it in the repository but exclude it
-# from the language statistics.
-alu64_top.nl.v linguist-generated=true

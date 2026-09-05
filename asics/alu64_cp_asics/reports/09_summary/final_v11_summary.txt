@@ -1,0 +1,81 @@
+============================================================
+ALU64_CP — FINAL V11 RTL-TO-GDSII IMPLEMENTATION
+============================================================
+
+Architecture
+------------
+64-bit ALU
+5-stage pipeline
+Latency: 5 cycles
+
+Technology
+----------
+PDK: Sky130A
+Standard Cell Library: sky130_fd_sc_hd
+Flow: LibreLane 3.0.11
+
+Final Run
+---------
+RUN_2026-09-05_10-52-32
+
+Physical Implementation
+-----------------------
+Die:             350 x 350 um
+Die area:        122500 um^2
+Instance area:   110506 um^2
+Utilization:     47.4887 %
+Std-cell area:   53035.9 um^2
+
+PPA
+---
+Total power:     6.161845 mW
+Route WL:        217570 um
+Route vias:      38822
+
+Timing
+------
+Setup WNS:       -4.811867 ns
+Setup TNS:       -190.528544 ns
+Hold WNS:         0 ns
+Hold violations: 0
+
+Signoff
+-------
+DRC:             PASS
+LVS:             PASS
+Antenna:         PASS
+Power grid:      0 violations
+GDSII:           GENERATED
+
+GDSII
+-----
+asic/gds/alu64_cp_top.gds
+
+Important Limitation
+--------------------
+The 10 ns setup timing target was not closed.
+Hold timing was clean.
+The design achieved complete physical implementation
+through routing, signoff checks and GDSII generation.
+
+Final RTL Selection
+-------------------
+V11 was selected as the final 5-stage RTL implementation
+after comparison against V2 and V17.
+
+V2:
+- lower power reference
+- stronger setup result than V11 in some physical runs
+- retained as low-power reference
+
+V17:
+- lowest synthesized cell count
+- lowest routing wirelength/vias among the main RTL candidates
+- setup timing degraded substantially
+- retained as synthesis/routing reference
+
+V11:
+- best overall physical balance
+- clean DRC/LVS/Antenna
+- clean hold timing
+- selected as final implementation

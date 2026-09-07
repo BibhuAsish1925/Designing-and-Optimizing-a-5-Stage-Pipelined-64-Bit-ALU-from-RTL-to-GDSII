@@ -1,23 +1,10 @@
-# ============================================================
-# GitHub Linguist configuration
-# 64-bit 5-Stage Pipelined ALU — RTL to GDSII
-# ============================================================
-
-# ------------------------------------------------------------
 # Hardware / RTL
-# ------------------------------------------------------------
 *.sv linguist-language=SystemVerilog
-*.svh linguist-language=SystemVerilog
-*.v linguist-language=Verilog
+*.v linguist-generated=true
 *.vh linguist-language=Verilog
+*.svh linguist-language=SystemVerilog
 
-# Generated Verilog / ASIC netlists
-*.nl.v linguist-language=Verilog linguist-generated=true
-*.pnl.v linguist-language=Verilog linguist-generated=true
-
-# ------------------------------------------------------------
 # Automation / scripting
-# ------------------------------------------------------------
 *.py linguist-language=Python
 *.tcl linguist-language=Tcl
 *.sh linguist-language=Shell
@@ -26,33 +13,21 @@
 *.bat linguist-language=Batchfile
 *.cmd linguist-language=Batchfile
 
-# ------------------------------------------------------------
 # Configuration
-# ------------------------------------------------------------
 *.yaml linguist-language=YAML
 *.yml linguist-language=YAML
 *.json linguist-language=JSON
 *.toml linguist-language=TOML
 *.ini linguist-language=INI
 
-# ------------------------------------------------------------
 # Documentation
-# ------------------------------------------------------------
 *.md linguist-language=Markdown
-*.rst linguist-language=reStructuredText
+*.rst linguist-language= reStructuredText
 *.txt linguist-language=Text
 
-# ------------------------------------------------------------
 # Build / dependency files
-# ------------------------------------------------------------
 Makefile linguist-language=Makefile
 *.mk linguist-language=Makefile
 
-# ------------------------------------------------------------
-# Generated ASIC files
-# ------------------------------------------------------------
-*.lef linguist-generated=true
-*.def linguist-generated=true
-*.spice linguist-generated=true
-*.mag linguist-generated=true
-*.gds linguist-generated=true
+# Generated ASIC netlists
+*.nl.v linguist-generated=true

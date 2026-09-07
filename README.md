@@ -28,8 +28,8 @@ The project progresses from a basic 64-bit combinational ALU to a complete ASIC 
 
 # Tools and Technologies
 
-| CategoryTool / Technology |
-| ------------------------- |
+| CategoryTool | Technology | 
+| ------------------------- | ------------------------ |
 | RTL                       | SystemVerilog            |
 | RTL Simulation            | Icarus Verilog           |
 | FPGA Synthesis            | Xilinx Vivado 2025.1     |
@@ -59,8 +59,8 @@ carry_in
 
 The ALU supports 16 operations:
 
-| OpcodeOperation |
-| --------------- |
+| Opcode | Operations |
+| --------------- | ---------------------- |
 | `0000`          | ADD                    |
 | `0001`          | SUBTRACT               |
 | `0010`          | AND                    |
@@ -428,8 +428,8 @@ Official frozen run:
 RUN_2026-09-05_10-52-32
 ```
 
-| ParameterFinal Result |
-| --------------------- |
+| Parameters | Final Result |
+| --------------------- | ------------ |
 | RTL                   | V11          |
 | Pipeline              | 5-stage      |
 | Latency               | 5 cycles     |

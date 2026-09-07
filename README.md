@@ -453,12 +453,7 @@ RUN_2026-09-05_10-52-32
 
 # Static Timing Analysis
 
-Post-route STA confirmed:
-
-```text
-Hold timing:
-✅ PASS
-```
+Post-route STA confirmed: `Hold timing: ✅ PASS`
 
 No hold violations were reported.
 
@@ -489,46 +484,19 @@ Equivalent frequency: `67.5 MHz`
 
 # Physical Verification
 
-### DRC
+### DRC `DRC: ✅ PASS`
 
-```text
-DRC: ✅ PASS
-```
+### LVS `Circuits match uniquely. LVS: ✅ PASS`
 
-### LVS
+### Antenna `Violating nets : 0, Violating pins : 0 and Antenna: ✅ PASS`
 
-```text
-Circuits match uniquely.
-LVS: ✅ PASS
-```
-
-### Antenna
-
-```text
-Violating nets : 0
-Violating pins : 0
-
-Antenna: ✅ PASS
-```
-
-### Power Grid
-
-```text
-VPWR worst drop : 0.594 mV
-VGND worst drop : 0.493 mV
-```
-
-Approximately **0.03%** of nominal supply, with no reported power-grid violations.
+### Power Grid ` VPWR worst drop : 0.594 mV, VGND worst drop : 0.493 mV`. Approximately **0.03%** of nominal supply, with no reported power-grid violations.
 
 ---
 
 # Final GDSII
 
-Final GDSII:
-
-```text
-runs/RUN_2026-09-05_10-52-32/final/gds/alu64_cp_top.gds
-```
+Final GDSII: `runs/RUN_2026-09-05_10-52-32/final/gds/alu64_cp_top.gds`
 
 Related physical views include:
 
@@ -654,45 +622,23 @@ python3 scripts/python/run_yosys.py
 python3 scripts/python/collect_ppa.py <LibreLane-run-directory>
 ```
 
----
-
 # Vivado Tcl Automation
 
-### Project Creation
+### Project Creation `scripts/tcl/vivado_create_project.tcl`
 
-```text
-scripts/tcl/vivado_create_project.tcl
-```
-
-### Synthesis and Reports
-
-```text
-scripts/tcl/vivado_synth_reports.tcl
-```
+### Synthesis and Reports `scripts/tcl/vivado_synth_reports.tcl`
 
 These scripts automate Vivado project creation and synthesis/report generation.
 
----
-
 # Yosys Automation
 
-Synthesis script:
-
-```text
-scripts/yosys/synth.ys
-```
+Synthesis script: `scripts/yosys/synth.ys`
 
 It elaborates and maps the RTL to the Sky130 standard-cell library.
 
----
-
 # LibreLane Configuration
 
-Final configuration:
-
-```text
-scripts/librelane/config_v11_final.yaml
-```
+Final configuration: `scripts/librelane/config_v11_final.yaml`
 
 Defines the design, RTL sources, PDK, standard cells, clock, timing, synthesis strategy, die dimensions, PNR/signoff SDC, and post-route optimization settings.
 
@@ -734,9 +680,7 @@ Setup Timing @ 100 MHz      ⚠️ OPEN
 
 # Final Result
 
-The project demonstrates a complete **64-bit ALU RTL-to-GDSII flow**.
-
-The final `alu64_cp` provides:
+The project demonstrates a complete **64-bit ALU RTL-to-GDSII flow**. The final `alu64_cp` provides:
 
 - 64-bit datapath
 - 16 ALU operations
@@ -755,9 +699,7 @@ The final `alu64_cp` provides:
 - Post-route STA
 - GDSII generation
 
-The implementation is **functionally verified, physically clean, and GDSII-complete**. DRC, LVS, antenna, power-grid, and hold checks pass.
-
-The only open item is the **100 MHz setup target**, with critical paths dominated by the result-selection/decode logic between pipeline stages. This limitation is documented transparently as part of the final implementation.
+The implementation is **functionally verified, physically clean, and GDSII-complete**. DRC, LVS, antenna, power-grid, and hold checks pass. The only open item is the **100 MHz setup target**, with critical paths dominated by the result-selection/decode logic between pipeline stages. This limitation is documented transparently as part of the final implementation.
 
 ---
 

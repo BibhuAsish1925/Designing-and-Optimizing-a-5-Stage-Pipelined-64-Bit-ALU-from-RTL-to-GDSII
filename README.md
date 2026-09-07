@@ -1,510 +1,1094 @@
 # Designing and Optimizing a 5-Stage Pipelined 64-Bit ALU from RTL to GDSII
 
-## Overview
+A complete digital ASIC design project implementing a **64-bit Arithmetic Logic Unit (ALU)** and taking the design through RTL development, functional verification, FPGA-oriented synthesis, ASIC synthesis, physical design, timing analysis, physical verification, and final **GDSII generation** using the **SkyWater SKY130A** open-source technology.
 
-This project presents the complete **RTL-to-GDSII implementation of a 64-bit Arithmetic Logic Unit (ALU)**, developed from SystemVerilog RTL through functional verification, FPGA analysis, ASIC synthesis, physical implementation, routing, and final layout generation.
-
-The main objective was to build a practical digital datapath and understand how the same RTL design behaves across an FPGA-oriented flow and a standard-cell ASIC flow. The ASIC implementation targets the **Sky130A** technology using the `sky130_fd_sc_hd` standard-cell library and a Dockerized LibreLane/OpenROAD flow.
-
-The project also focuses on practical **PPA analysis (Performance, Power, and Area)** and on understanding the effect of RTL structure, fanout, buffering, routing, and physical constraints on the final implementation.
+The main design in this project is **`alu64_cp`**, a clocked and 5-stage pipelined 64-bit ALU developed as the next stage of the original non-clocked, non-pipelined `alu64` design.
 
 ---
 
-## Design Specification
+## 1. Project Overview
 
-| Parameter | Description |
-|---|---|
-| **Architecture** | 64-bit ALU |
-| **Data Width** | 64 bits |
-| **Opcode Width** | 4 bits |
-| **Operations** | 16 |
-| **Inputs** | `operand_a`, `operand_b`, `cmd`, `carry_in`, `rst_n`, `clk` |
-| **Outputs** | `result`, `carry_out`, `zero_flag`, `negative_flag`, `overflow_flag` |
-| **RTL Language** | SystemVerilog |
-| **ASIC Technology** | Sky130A |
-| **Standard Cell Library** | `sky130_fd_sc_hd` |
-| **FPGA Device** | `xc7a200tfbg676-2` |
-| **FPGA Tool** | Vivado 2025.1 |
-| **ASIC Flow** | LibreLane 3.0.11 + OpenROAD |
-| **Environment** | Ubuntu/WSL2 + Docker |
+The project was developed as a complete **RTL-to-GDSII digital ASIC flow**. The work started with a conventional combinational 64-bit ALU (`alu64`) to establish the basic functionality and architecture. The design was then developed into **`alu64_cp` — Clocked & Pipelined 64-bit ALU**
 
----
+The pipelined design introduces:
 
-## ALU Operations
+- Synchronous clocking
+- Active-low synchronous reset
+- Five-stage pipeline architecture
+- Valid transaction propagation
+- Registered ALU outputs
+- Timing-aware ASIC implementation
+- Physical design using Sky130A
+- Post-route static timing analysis
+- Physical verification
+- Final GDSII generation
 
-The 4-bit command field provides 16 possible ALU operations:
-
-| Opcode | Operation | Description |
-|---|---|---|
-| `0000` | ADD | 64-bit addition with carry-in |
-| `0001` | SUBTRACT | 64-bit subtraction with carry-in |
-| `0010` | AND | Bitwise AND |
-| `0011` | OR | Bitwise OR |
-| `0100` | XOR | Bitwise XOR |
-| `0101` | NOT | Bitwise inversion of operand A |
-| `0110` | SHIFT LEFT | Logical left shift |
-| `0111` | SHIFT RIGHT | Logical right shift |
-| `1000` | ARITHMETIC SHIFT | Signed right shift |
-| `1001` | COMPARE EQUAL | Equality comparison |
-| `1010` | COMPARE LESS | Less-than comparison |
-| `1011` | COMPARE GREATER | Greater-than comparison |
-| `1100` | INCREMENT | Increment operand A |
-| `1101` | DECREMENT | Decrement operand A |
-| `1110` | PASS A | Pass operand A |
-| `1111` | PASS B | Pass operand B |
-
-The ALU also generates arithmetic and status information through the carry, zero, negative, and overflow flags.
+The objective was not only to implement the ALU functionality, but to demonstrate a complete hardware implementation flow from **RTL source code to a manufacturable layout database**.
 
 ---
 
-## System Architecture
+## 2. Design Flow
 
-The design is divided into small RTL blocks to keep the implementation easy to verify and synthesize.
-
-<table align="center">
-    <td align="center">
-      <img width="1536" height="1024" alt="circuit diagram" src="https://github.com/user-attachments/assets/a817282d-197b-4dff-a462-203e9c57eeac" /><br/>
-      <small> Fig. Complete System Architecture
-    </td>
-</table>
-
-The RTL uses combinational ALU logic with dedicated handling for arithmetic operations, logical operations, shifts, comparisons, and status-flag generation.
-
-The project is described as a pipelined ALU at the project level, while the final top-level implementation used for the Sky130A physical flow is effectively **combinational for timing analysis**, with no register-to-register timing paths. This distinction is important when interpreting the final timing results.
+The overall project flow was:
 
 ```text
-             ┌───────────────────────┐
-operand_a ──►│                       │
-operand_b ──►│       64-bit ALU      │──► result[63:0]
-cmd[3:0] ───►│                       │──► carry_out
-carry_in ───►│   Arithmetic / Logic  │──► zero_flag
-             │   Shift / Compare     │──► negative_flag
-             │                       │──► overflow_flag
-             └───────────────────────┘
-```
-
----
-
-## RTL Implementation
-
-The main RTL components are:
-
-| File | Purpose |
-|---|---|
-| `alu64_pkg.sv` | Shared ALU definitions and package information |
-| `alu64_core.sv` | Main 64-bit ALU datapath and flag generation |
-| `alu64_top.sv` | Top-level design wrapper |
-
-The RTL was first developed and checked in **Vivado** before being transferred into the Linux-based ASIC flow.
-
-The implementation includes arithmetic extension for carry handling, signed overflow detection, shift operations, comparison logic, and automatic zero/negative flag generation.
-
----
-
-## Functional Verification
-
-Verification was performed before physical implementation using dedicated self-checking SystemVerilog testbenches.
-
-The verification strategy included:
-
-- Directed tests for individual ALU operations.
-- Corner-case testing for arithmetic and shift operations.
-- Randomized operand and command testing.
-- Automatic expected-value generation.
-- Self-checking comparisons between expected and actual outputs.
-- Separate package, core, and top-level verification.
-
-### Verification Results
-
-| Test | Result |
-|---|---:|
-| Package Tests | **PASS** |
-| Core Verification | **2038 / 2038 PASS** |
-| Top-Level Verification | **1017 / 1017 PASS** |
-| Inferred Latches | **0** |
-| Synthesis Check Errors | **0** |
-| Lint Errors | **0** |
-| Lint Warnings | **5** |
-
-The verification environment was adapted for **Vivado XSim**, including the use of compatible deterministic randomization methods where required by the simulator.
-
----
-
-## FPGA Analysis
-
-After RTL verification, the design was analyzed in Vivado on the target FPGA device.
-
-### Resource Utilization
-
-| Resource | Usage |
-|---|---:|
-| Slice LUTs | **1061** |
-| LUT as Logic | **1061** |
-| Slice Registers | **0** |
-| F7 Muxes | **16** |
-| F8 Muxes | **4** |
-| BRAM | **0** |
-| DSP | **0** |
-| Bonded I/O | **201** |
-| CARRY4 | **87** |
-
-The absence of registers is consistent with the final combinational ALU implementation.
-
----
-
-### Vivado Power Estimate
-
-| Metric | Result |
-|---|---:|
-| Total Power | **43.748 W** |
-| Dynamic Power | **42.756 W** |
-| Static Power | **0.992 W** |
-| I/O Power | **31.815 W** |
-| Junction Temperature | **106.8°C** |
-| Thermal Margin | **-21.8°C** |
-
-The FPGA power number is an implementation-specific estimate and is heavily dominated by I/O power. Therefore, it is not directly comparable with the later Sky130A ASIC power estimate.
-
----
-
-# ASIC RTL-to-GDSII Flow
-
-For the ASIC implementation, the verified RTL was moved to an Ubuntu/WSL2 environment and processed using a Dockerized **LibreLane 3.0.11** flow.
-
-The implementation used:
-
-```text
-SystemVerilog RTL
-        ↓
+ALU Specification
+       │
+       ▼
+64-bit Combinational ALU
+       │
+       ▼
+Clocked & Pipelined ALU
+       │
+       ▼
+RTL Functional Verification
+       │
+       ▼
+Randomized Verification
+       │
+       ▼
+Vivado Synthesis / Timing / Power
+       │
+       ▼
+ASIC Top-Level Integration
+       │
+       ▼
+SDC Timing Constraints
+       │
+       ▼
 Yosys Synthesis
-        ↓
+       │
+       ▼
+LibreLane + SKY130A
+       │
+       ▼
 Floorplanning
-        ↓
+       │
+       ▼
 Placement
-        ↓
-Timing / Fanout Repair
-        ↓
+       │
+       ▼
+Clock Tree Synthesis
+       │
+       ▼
 Global Routing
-        ↓
+       │
+       ▼
 Detailed Routing
-        ↓
+       │
+       ▼
 Antenna Repair
-        ↓
-Physical Verification
-        ↓
-GDSII Generation
-```
-
-The Sky130A `sky130_fd_sc_hd` standard-cell library was used for mapping the synthesized design.
-
----
-
-## Floorplanning and Placement
-
-The initial floorplan was intentionally tested with a smaller die size. The first implementation encountered detailed-placement failures due to the available placement resources and utilization.
-
-The floorplan was subsequently increased to a **250 µm × 250 µm** die, which allowed placement and subsequent routing to complete successfully.
-
-The final implementation achieved:
-
-| Metric | Result |
-|---|---:|
-| Die Size | **250 µm × 250 µm** |
-| Die Area | **62,500 µm²** |
-| Core Area | **53,897.9 µm²** |
-| Utilization | **74.56%** |
-| Total Instances | **9,085** |
-| Standard Cells | **4,785** |
-| Standard Cell Area | **40,188.5 µm²** |
-| Macros | **0** |
-| Pad Cells | **0** |
-| Design I/O | **205** |
-
----
-
-## Routing and Physical Optimization
-
-The routing stage included global routing, detailed routing, timing/fanout repair, and antenna checking.
-
-During routing, antenna violations were detected and subsequently repaired using diode insertion followed by detailed-route refinement.
-
-### Final Routing Results
-
-| Metric | Result |
-|---|---:|
-| Estimated Route Wirelength | **168,746 µm** |
-| Global Route Wirelength | **295,223 µm** |
-| Final Route Wirelength | **205,089 µm** |
-| Route Nets | **4,117** |
-| Route Vias | **41,023** |
-| Final DRC Errors | **0** |
-| Antenna Violating Nets | **0** |
-| Antenna Diodes | **19** |
-
-The final routed database completed with zero detailed-routing violations and clean antenna results.
-
----
-
-# ASIC Power Results
-
-The nominal post-route power report was evaluated at:
-
-```text
-nom_tt_025C_1v80
-```
-
-### Nominal Power
-
-| Power Component | Power |
-|---|---:|
-| Internal | **0.2863 mW** |
-| Switching | **0.4154 mW** |
-| Leakage | **0.0000147 mW** |
-| Clock | **0.0000098 mW** |
-| **Total** | **0.7017 mW** |
-
-This result represents the nominal post-route ASIC estimate and is fundamentally different from the FPGA power estimate because the implementation technology, cell library, voltage, routing, and I/O assumptions are different.
-
----
-
-# Timing Analysis
-
-Because the final top-level ALU implementation is combinational, there are **no register-to-register paths**. Timing was therefore analyzed using interface delays and a virtual-clock based constraint model.
-
-### Final Timing Summary
-
-| Metric | Result |
-|---|---:|
-| Hold WNS | **+16.2754 ns** |
-| Hold TNS | **0 ns** |
-| Hold Violations | **0** |
-| Setup WNS | **-3.8183 ns** |
-| Setup TNS | **-3.9432 ns** |
-| Setup Violations | **5** |
-| Register-to-Register Paths | **0** |
-
-The hold analysis is clean, while setup timing still has violations. Therefore, the final physical implementation should **not be described as timing-closed**.
-
-### Worst Setup Path
-
-| Parameter | Result |
-|---|---|
-| Startpoint | `operand_b[1]` |
-| Endpoint | `zero_flag` |
-| Corner | `max_ss_100C_1v60` |
-| Input External Delay | **8 ns** |
-| Required Time | **31.75 ns** |
-| Arrival Time | **35.5683 ns** |
-| Worst Slack | **-3.8183 ns** |
-
-The critical path is dominated by the large combinational logic and high-fanout buffering between the input and status/output logic. This path provides the main opportunity for future timing optimization.
-
----
-
-# Physical Sign-Off Results
-
-The final design passed the major physical verification checks.
-
-| Check | Result |
-|---|---:|
-| DRC | **0 errors** |
-| Magic DRC | **0 errors** |
-| KLayout DRC | **0 errors** |
-| LVS | **0 errors** |
-| XOR Comparison | **0 differences** |
-| Antenna | **0 violations** |
-| Power Grid | **0 violations** |
-| Critical Disconnected Pins | **0** |
-| GDSII Generation | **PASS** |
-
-These results indicate that the final physical database and extracted layout are consistent and pass the implemented physical verification checks, although setup timing still requires optimization.
-
----
-
-# Final Layout Outputs
-
-The final ASIC implementation generated the following deliverables:
-
-| File | Description |
-|---|---|
-| `alu64_top.gds` | Final GDSII layout |
-| `alu64_top.def` | Final routed physical database |
-| `alu64_top.lef` | Abstract physical layout |
-| `alu64_top.nl.v` | Gate-level netlist |
-| `alu64_top.spice` | Extracted SPICE netlist |
-
-The main final layout files are stored in:
-
-```text
-asic/reports/08_final_layout/
-```
-
----
-
-# Layout Preview
-
-### Final ASIC Layout
-
-<table align="center">
-    <td align="center">
-      <img width="1105" height="857" alt="layout_ss2" src="https://github.com/user-attachments/assets/e6e4560f-28f9-4feb-b58d-8c6109152b05" /><br/>
-      <small> Fig. Final ASIC Layout
-    </td>
-</table>
-        
-### Additional Layout View
-
-<table align="center">
-    <td align="center">
-      <img width="1917" height="1017" alt="layout_ss1" src="https://github.com/user-attachments/assets/e43d6f5b-22c6-4649-8bdd-104a0868e1f1" /><br/>
-      <small> Fig. Additional Layout View window
-    </td>
-</table>
-
----
-
-## Final PPA & Performance Metrics
-
-The following metrics summarize the final **Sky130A post-route implementation** of the 64-bit ALU. Area, power, routing, timing, and physical sign-off results were collected from the final LibreLane/OpenROAD reports.
-
-| Metric | Result | Description / Context |
-| :--- | :--- | :--- |
-| **Architecture** | **64-bit ALU** | Combinational top-level implementation |
-| **Opcodes** | **16** | 4-bit command field |
-| **Technology** | **Sky130A** | `sky130_fd_sc_hd` standard-cell library |
-| **Die Size** | **250 × 250 µm** | Final floorplan |
-| **Die Area** | **62,500 µm²** | Final physical die area |
-| **Core Area** | **53,897.9 µm²** | Final core area |
-| **Standard Cell Area** | **40,188.5 µm²** | Synthesized standard-cell area |
-| **Total Instances** | **9,085** | Final implemented instances |
-| **Standard Cells** | **4,785** | Final standard-cell count |
-| **Cell Utilization** | **74.56%** | Final placement utilization |
-| **Nominal ASIC Power** | **0.7017 mW** | `nom_tt_025C_1v80`, post-route |
-| **Hold WNS** | **+16.2754 ns** | Hold timing margin |
-| **Hold TNS** | **0 ns** | No hold violations |
-| **Setup WNS** | **-3.8183 ns** | Worst setup slack |
-| **Setup TNS** | **-3.9432 ns** | Total setup negative slack |
-| **Setup Violations** | **5** | Timing closure not achieved |
-| **Register-to-Register Paths** | **0** | Combinational top-level design |
-| **Final Route Wirelength** | **205,089 µm** | Post-route wirelength |
-| **Route Nets** | **4,117** | Final routed nets |
-| **Route Vias** | **41,023** | Final routed vias |
-| **Antenna Violations** | **0** | After antenna repair |
-| **DRC Errors** | **0** | Final physical verification |
-| **LVS Errors** | **0** | Layout-versus-schematic verification |
-| **XOR Differences** | **0** | Layout comparison |
-| **Power Grid Violations** | **0** | Final power-grid check |
-| **GDSII** | **Generated** | Final `alu64_top.gds` |
-
-> **Note:** Unlike the reference pipelined ASIC design, this implementation does not have a meaningful operating-frequency, throughput, pipeline-latency, energy/op, or clock-tree-power figure because the final top-level design is combinational and has no register-to-register timing paths. The most relevant performance metric is therefore the **interface-based setup timing**, with a current worst-case slack of **-3.8183 ns**.
----
-
-# Project Structure
-
-```text
-├── asic/
-│   ├── config.yaml
-│   ├── layout_ss1.png
-│   ├── layout_ss2.png
-│   └── reports/
-│       ├── 01_metrics/
-│       ├── 02_timing/
-│       ├── 03_power/
-│       ├── 04_area/
-│       ├── 05_routing/
-│       ├── 06_ir_drop/
-│       ├── 07_drc_lvs/
-│       ├── 08_final_layout/
-│       └── 09_summary/
-│
-├── rtl/
-│   ├── alu64_core.sv
-│   ├── alu64_pkg.sv
-│   └── alu64_top.sv
-│
-├── tb/
-│   ├── alu64_core_tb.sv
-│   ├── alu64_pkg_tb.sv
-│   └── alu64_top_tb.sv
-│
-├── scripts/
-│   ├── collect_reports.py
-│   └── collect_reports.tcl
-│
-├── vivado/
-│   └── reports/
-│
-├── docs/
-├── README.md
-└── LICENSE
-```
-
----
-
-# Automation
-
-Two report-collection utilities are included to organize the LibreLane outputs:
-
-- `scripts/collect_reports.py` — Python-based report collection.
-- `scripts/collect_reports.tcl` — Tcl-based report collection.
-
-These scripts collect important timing, power, area, routing, physical-verification, and final-layout outputs into an organized report structure for easier analysis and repository management.
-
----
-
-# Development Environment
-
-The project was developed across Windows and Linux environments:
-
-```text
-Windows
-   ↓
-Vivado 2025.1
-   ↓
-WSL2 / Ubuntu
-   ↓
-Docker
-   ↓
-LibreLane 3.0.11
-   ↓
-Yosys + OpenROAD
-   ↓
-Sky130A
-   ↓
+       │
+       ▼
+DRC / LVS / Antenna / Power Grid
+       │
+       ▼
+Post-Route STA
+       │
+       ▼
 GDSII
 ```
 
-This setup allows the RTL to be verified using Vivado before moving the same design into an open-source ASIC implementation flow.
+---
+
+# 3. ALU Specification
+
+The ALU operates on two 64-bit operands:
+
+```
+operand_a[63:0]
+operand_b[63:0]
+```
+
+and uses a 4-bit command:
+
+```
+cmd[3:0]
+```
+
+The complete operation set contains 16 instructions.
+
+| OpcodeOperation |                        |
+| --------------- | ---------------------- |
+| `0000`          | ADD                    |
+| `0001`          | SUBTRACT               |
+| `0010`          | AND                    |
+| `0011`          | OR                     |
+| `0100`          | XOR                    |
+| `0101`          | NOT                    |
+| `0110`          | SHIFT LEFT             |
+| `0111`          | SHIFT RIGHT            |
+| `1000`          | ARITHMETIC SHIFT RIGHT |
+| `1001`          | COMPARE EQUAL          |
+| `1010`          | COMPARE LESS           |
+| `1011`          | COMPARE GREATER        |
+| `1100`          | INCREMENT              |
+| `1101`          | DECREMENT              |
+| `1110`          | PASS A                 |
+| `1111`          | PASS B                 |
+
+The ALU also supports:
+
+-  Carry input 
+-  Carry output 
+-  Zero flag 
+-  Negative flag 
+-  Signed overflow flag 
+-  Signed comparison operations 
 
 ---
 
-# Project Status
+# 4. `alu64_cp` Architecture
 
-| Stage | Status |
-|---|---|
-| RTL Design | ✅ Complete |
-| Functional Verification | ✅ Passed |
-| Randomized Verification | ✅ Passed |
-| Vivado Analysis | ✅ Complete |
-| ASIC Synthesis | ✅ Complete |
-| Floorplanning | ✅ Complete |
-| Placement | ✅ Complete |
-| Routing | ✅ Complete |
-| Antenna Repair | ✅ Complete |
-| DRC | ✅ Passed |
-| LVS | ✅ Passed |
-| IR Drop | ✅ Passed |
-| GDSII Generation | ✅ Complete |
-| Setup Timing Closure | ⚠️ Requires Optimization |
+The main design is a **five-stage pipelined 64-bit ALU**.
+
+```
+                ┌──────────────────────────┐
+operand_a ─────►│                          │
+operand_b ─────►│        Stage 1           │
+cmd ───────────►│      Input Capture       │
+carry_in ──────►│                          │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │        Stage 2           │
+                │   Operand / Command      │
+                │        Registers          │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │        ALU Core           │
+                │ Arithmetic / Logic /      │
+                │ Shift / Compare / Pass    │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │        Stage 3           │
+                │   Result / Carry /       │
+                │      Overflow Registers   │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │        Stage 4           │
+                │     Flag Generation      │
+                │   Zero / Negative        │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │        Stage 5           │
+                │      Output Registers    │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                    Registered Outputs
+```
+
+> The pipeline provides a fixed latency of **5 clock cycles**
+
+> The `valid_in` signal travels through the pipeline together with the transaction and produces `valid_out` at the corresponding output cycle.
 
 ---
 
-## Conclusion
+## 5. Pipeline Interface
 
-This project demonstrates a complete practical flow from **64-bit SystemVerilog RTL to a routed Sky130A GDSII layout**. The design was functionally verified, synthesized, placed, routed, antenna-repaired, and physically verified with clean DRC, LVS, XOR, antenna, and power-grid checks.
+### Inputs
 
-The final implementation occupies **62,500 µm² of die area**, uses **74.56% utilization**, and has a nominal post-route power estimate of **0.7017 mW**.
+```
+clk
+rst_n
+valid_in
 
-The main remaining optimization target is **setup timing**, with a worst-case setup slack of **-3.8183 ns**. Future work can focus on reducing the critical combinational path, controlling high-fanout nets, improving buffering and routing, and exploring alternative synthesis and floorplanning strategies to improve the overall PPA.
+operand_a[63:0]
+operand_b[63:0]
+
+cmd[3:0]
+carry_in
+```
+
+### Outputs
+
+```
+valid_out
+
+result[63:0]
+carry_out
+zero_flag
+negative_flag
+overflow_flag
+```
+
+The reset is:
+
+> **Active-low synchronous reset**
+
+During reset, pipeline state, valid state, and registered outputs are cleared.
 
 ---
+
+# 6. ALU Core Operations
+
+### Arithmetic
+
+The arithmetic datapath implements:
+
+-  Addition 
+-  Subtraction 
+-  Increment 
+-  Decrement 
+
+Carry handling is explicitly defined for unsigned arithmetic.
+
+For subtraction and decrement, the carry output represents the **no-borrow condition**.
+
+Signed overflow detection is implemented for operations where signed overflow is meaningful.
+
+---
+
+### Logic
+
+The ALU implements:
+
+```
+AND
+OR
+XOR
+NOT
+```
+
+These operations produce a 64-bit result.
+
+---
+
+### Shift Operations
+
+Three shift operations are supported:
+
+```
+Shift Left
+Logical Shift Right
+Arithmetic Shift Right
+```
+
+The shift amount is derived from the lower six bits of `operand_b`.
+
+This allows all shift distances from:
+
+```
+0 through 63
+```
+
+---
+
+### Comparisons
+
+The ALU implements:
+
+```
+Equal
+Less Than
+Greater Than
+```
+
+The less-than and greater-than operations use **signed comparison semantics**.
+
+Comparison results are represented through the ALU result and associated flags.
+
+---
+
+### Pass Operations
+
+Two direct data-transfer operations are provided:
+
+```
+PASS A
+PASS B
+```
+
+These allow either input operand to be forwarded directly to the result.
+
+---
+
+# 7. Verification
+
+Verification was performed at multiple levels.
+
+## Package Verification
+
+The opcode package was checked to ensure that all 16 command encodings map correctly to the specified operations.
+
+---
+
+## ALU Core Verification
+
+The combinational ALU core was tested for:
+
+-  All 16 operations 
+-  Arithmetic correctness 
+-  Carry behavior 
+-  Overflow behavior 
+-  Shift behavior 
+-  Signed comparisons 
+-  Pass operations 
+-  Flag generation 
+
+---
+
+## Pipeline Verification
+
+The pipeline testbench verifies:
+
+-  Five-cycle latency 
+-  Transaction ordering 
+-  Pipeline valid propagation 
+-  Reset behavior 
+-  Output correctness 
+-  Bubble handling 
+
+---
+
+## Randomized Verification
+
+A deterministic randomized verification environment was also used.
+
+The randomized tests exercised:
+
+-  Multiple operand combinations 
+-  All 16 ALU operations 
+-  Carry-in variations 
+-  Pipeline bubbles 
+-  Reset behavior 
+-  Result ordering 
+-  Carry flags 
+-  Zero flag 
+-  Negative flag 
+-  Overflow flag 
+
+The final randomized verification completed successfully with:
+
+```
+Transactions generated : 1007
+Checks generated       : 1184
+Passed                 : 1184
+Failed                 : 0
+
+ALU64_CP Step 6 randomized verification: PASS
+```
+
+---
+
+# 8. RTL Simulation
+
+The RTL was simulated using:
+
+```
+Icarus Verilog
+```
+
+with SystemVerilog support enabled using:
+
+```
+-g2012
+```
+
+Example verification flow:
+
+```
+iverilog -g2012 \
+  -o /tmp/alu64_cp_core_tb \
+  src/alu64_cp_pkg.sv \
+  src/alu64_cp_core.sv \
+  tb/alu64_cp_core_tb.sv
+
+vvp /tmp/alu64_cp_core_tb
+```
+
+Equivalent tests were performed for:
+
+-  Core 
+-  Pipeline 
+-  Top-level design 
+
+---
+
+# 9. FPGA-Oriented Verification and Analysis
+
+The design was also taken through:
+
+> **Xilinx Vivado 2025.1**
+
+Target device:
+
+```
+xc7a200tfbg676-2
+```
+
+Vivado was used for:
+
+-  RTL synthesis 
+-  Resource utilization 
+-  Timing analysis 
+-  Power estimation 
+
+The design synthesized successfully with approximately:
+
+```
+1181 LUTs
+489 FFs
+0 BRAM
+0 DSP
+```
+
+At the 100 MHz analysis point, the design showed positive setup and hold timing margins in Vivado.
+
+Vivado power analysis reported approximately:
+
+```
+Total On-Chip Power : 0.190 W
+Dynamic Power       : 0.059 W
+Static Power        : 0.131 W
+```
+
+The power estimate was vectorless, so the reported confidence was low.
+
+---
+
+# 10. ASIC Implementation
+
+After RTL and FPGA-oriented verification, the design was prepared for ASIC implementation.
+
+The ASIC flow used:
+
+```
+Yosys
+LibreLane 3.0.11
+OpenROAD
+SkyWater SKY130A
+sky130_fd_sc_hd
+```
+
+The implementation was executed under:
+
+```
+Ubuntu / WSL
+```
+
+with the LibreLane environment running inside Docker.
+
+The Docker image used was:
+
+
+```
+ghcr.io/librelane/librelane:3.0.11
+```
+
+The PDK was supplied through the CIEL installation.
+
+---
+
+# 11. ASIC Synthesis
+
+Yosys was used to synthesize the RTL and map it to the Sky130 standard-cell library.
+
+The synthesis flow included:
+
+
+```
+RTL elaboration
+    ↓
+Process conversion
+    ↓
+Logic optimization
+    ↓
+FSM processing
+    ↓
+Memory processing
+    ↓
+Technology mapping
+    ↓
+ABC optimization
+    ↓
+Sky130 standard-cell mapping
+```
+
+The final V11 RTL synthesized to approximately:
+
+```
+Total cells       : 3753
+Sequential cells  : 471
+Combinational     : 3282
+```
+
+The synthesized design was then used as the basis for physical implementation.
+
+---
+
+# 12. Timing Constraints
+
+A dedicated SDC file was created for the ASIC implementation.
+
+The main clock constraint is:
+
+```
+Clock period : 10 ns
+Frequency    : 100 MHz
+```
+
+The constraint file includes:
+
+-  Clock definition 
+-  Clock uncertainty 
+-  Clock transition 
+-  Input delays 
+-  Output delays 
+-  Reset timing constraints 
+
+The custom SDC was integrated into both:
+
+```
+PNR_SDC_FILE
+SIGNOFF_SDC_FILE
+```
+
+This ensured that the physical implementation and signoff timing analysis used the project-specific constraints.
+
+---
+
+# 13. Physical Design Flow
+
+The final `alu64_cp` design was taken through the complete physical implementation flow.
+
+### Floorplanning
+
+The final implementation used an absolute die size of:
+
+```
+350 µm × 350 µm
+```
+
+giving:
+
+```
+Die area = 122,500 µm²
+```
+
+### Placement
+
+Standard cells were placed within the core region. Timing-aware physical optimization was used during implementation where appropriate.
+
+### Clock Tree Synthesis
+
+A clock tree was generated for the registered five-stage pipeline. Clock distribution and skew were analyzed during the physical implementation flow.
+
+### Global Routing
+
+The design was globally routed and congestion was evaluated.
+
+### Detailed Routing
+
+Detailed routing was performed after global routing. The final routed design was successfully completed and produced the required physical database.
+
+### Antenna Repair
+
+Antenna checking and repair were performed during the physical flow. The final design passed antenna verification.
+
+---
+
+# 14. Final Physical Results
+
+The official frozen final implementation is:
+
+```
+RUN_2026-09-05_10-52-32
+```
+
+The final physical results are approximately:
+
+| ParameterFinal Result |              |
+| --------------------- | ------------ |
+| RTL                   | V11          |
+| Pipeline              | 5-stage      |
+| Latency               | 5 cycles     |
+| Die Size              | 350 × 350 µm |
+| Die Area              | 122,500 µm²  |
+| Instance Area         | 110,506 µm²  |
+| Standard-cell Area    | 53,035.9 µm² |
+| Total Power           | 6.162 mW     |
+| Route Wirelength      | 217,570 µm   |
+| Route Vias            | 38,822       |
+| Setup WNS             | -4.812 ns    |
+| Setup TNS             | -190.529 ns  |
+| Hold WNS              | 0 ns         |
+| DRC                   | PASS         |
+| LVS                   | PASS         |
+| Antenna               | PASS         |
+| Power Grid            | PASS         |
+| GDSII                 | Generated    |
+
+---
+
+# 15. Static Timing Analysis
+
+Post-route STA was performed using the physical implementation flow.
+
+The final implementation achieved:
+
+```
+Hold timing:
+PASS
+```
+
+with no hold violations. The 10 ns setup target, however, was not fully closed.
+
+Final worst-case setup result:
+
+```
+WNS = -4.811867 ns
+TNS = -190.528544 ns
+```
+
+The worst setup path is primarily associated with the result-generation logic between the second and third pipeline stages.
+
+The critical path contains a deep Boolean/multiplexer network involving:
+
+-  Operand bits 
+-  Opcode decode 
+-  Result selection 
+-  Arithmetic/logic selection 
+-  Shift/compare logic 
+
+The post-route analysis indicates that the design's main timing limitation is the depth and fanout of this combinational result-generation cone rather than clock skew.
+
+The corresponding minimum clock period is approximately:
+
+```
+14.81 ns
+```
+
+or approximately:
+
+```
+67.5 MHz
+```
+
+based on the worst setup path. Therefore, the final physical design is:
+
+> **Functionally verified and physically signoff-clean, but not setup-timing closed at the 100 MHz target.**
+
+This timing limitation is explicitly retained in the project results rather than hidden or overstated.
+
+---
+
+# 16. Physical Verification
+
+The final physical design was checked using multiple verification stages.
+
+## DRC
+
+Design Rule Checking was completed successfully. ` DRC: PASS`
+
+## LVS
+
+Layout-versus-schematic verification was completed successfully. The final LVS result reported `Circuits match uniquely.` Therefore `LVS: PASS`
+
+## Antenna
+
+Antenna verification was completed successfully. Final antenna verification showed 
+
+```
+Violating nets : 0
+Violating pins : 0
+```
+
+Therefore `Antenna: PASS`
+
+## Power Grid
+
+The power-grid analysis completed without reported violations. The final IR-drop analysis showed approximately:
+
+```
+VPWR worst drop : 0.594 mV
+VGND worst drop : 0.493 mV
+```
+
+Both correspond to approximately `0.03%` of the nominal supply.
+
+---
+
+# 17. Final GDSII
+
+The physical implementation successfully generated the final GDSII layout. Official final GDS:
+
+```
+runs/RUN_2026-09-05_10-52-32/final/gds/alu64_cp_top.gds
+```
+
+The final implementation also contains related physical-design views including:
+
+```
+DEF
+GDS
+LEF
+SPICE
+Netlists
+KLayout GDS
+Magic GDS
+```
+
+These files are retained as part of the final ASIC implementation data.
+
+---
+
+# 18. Final Layout
+
+The generated GDSII can be viewed using `KLayout`
+
+The final layout contains the complete physical implementation of `alu64_cp_top`
+
+including:
+
+-  Standard cells 
+-  Routing 
+-  Power structures 
+-  Clock network 
+-  Input/output connectivity 
+-  Physical hierarchy 
+-  Technology layers 
+
+### Final GDSII Layout
+
+> **[Insert KLayout screenshot here]**
+
+ \<br> 
+
+```
+[ PROJECT IMAGE / KLAYOUT SCREENSHOT ]
+```
+
+---
+
+# 19. Recommended Project Images
+
+The following screenshots can be added to document the implementation visually.
+
+### RTL / Architecture
+
+> **[Insert 5-stage pipeline architecture diagram here]**
+
+ \<br> 
+
+```
+[ IMAGE PLACEHOLDER ]
+```
+
+### RTL Simulation
+
+> **[Insert RTL simulation waveform here]**
+
+ \<br> 
+
+```
+[ IMAGE PLACEHOLDER ]
+```
+
+### Vivado Results
+
+> **[Insert Vivado utilization/timing screenshot here]**
+
+ \<br> 
+
+```
+[ IMAGE PLACEHOLDER ]
+```
+
+### ASIC Floorplan
+
+> **[Insert floorplan screenshot here]**
+
+ \<br> 
+
+```
+[ IMAGE PLACEHOLDER ]
+```
+
+### Placement
+
+> **[Insert placement screenshot here]**
+
+ \<br> 
+
+```
+[ IMAGE PLACEHOLDER ]
+```
+
+### Routing
+
+> **[Insert routed layout screenshot here]**
+
+ \<br> 
+
+```
+[ IMAGE PLACEHOLDER ]
+```
+
+### Final GDSII
+
+> **[Insert final KLayout GDSII screenshot here]**
+
+ \<br> 
+
+```
+[ IMAGE PLACEHOLDER ]
+```
+
+---
+
+# 20. Automation Scripts
+
+The project includes reusable Python, Tcl, Yosys, and LibreLane scripts. The script collection is organized as:
+
+```
+scripts/
+├── python/
+│   ├── run_rtl_verify.py
+│   ├── run_yosys.py
+│   └── collect_ppa.py
+│
+├── tcl/
+│   ├── vivado_create_project.tcl
+│   └── vivado_synth_reports.tcl
+│
+├── yosys/
+│   └── synth.ys
+│
+└── librelane/
+    └── config_v11_final.yaml
+```
+
+These scripts are intended to make the project easier to reproduce and maintain.
+
+---
+
+# 21. Python Automation
+
+Python scripts are used for:
+
+-  RTL verification automation 
+-  Yosys synthesis automation 
+-  PPA report extraction 
+-  Reproducible project execution 
+
+Example: `python3 scripts/python/run_rtl_verify.py`
+
+Yosys automation: `python3 scripts/python/run_yosys.py`
+
+PPA collection: `python3 scripts/python/collect_ppa.py <LibreLane-run-directory>`
+
+---
+
+# 22. Vivado Tcl Automation
+
+Vivado Tcl scripts are provided for:
+
+### Project creation
+
+```
+scripts/tcl/vivado_create_project.tcl
+```
+
+### Synthesis and reports
+
+```
+scripts/tcl/vivado_synth_reports.tcl
+```
+
+This allows the Vivado project and synthesis reports to be generated without manually recreating the project setup.
+
+---
+
+# 23. Yosys Automation
+
+The Yosys synthesis script is located at: `scripts/yosys/synth.ys`
+It contains the synthesis flow used to elaborate and map the RTL to the Sky130 standard-cell library.
+
+---
+
+# 24. LibreLane Configuration
+
+The final ASIC implementation configuration is maintained under: `scripts/librelane/config_v11_final.yaml`
+
+The configuration defines:
+
+-  Design name 
+-  RTL source files 
+-  PDK 
+-  Standard-cell library 
+-  Clock port 
+-  Clock period 
+-  Synthesis strategy 
+-  Physical die dimensions 
+-  PNR SDC 
+-  Signoff SDC 
+-  Post-global-route timing optimization
+
+---
+
+# 25. Tools and Technologies
+
+| CategoryTool / Technology |                          |
+| ------------------------- | ------------------------ |
+| RTL                       | SystemVerilog            |
+| RTL Simulation            | Icarus Verilog           |
+| FPGA Synthesis            | Xilinx Vivado 2025.1     |
+| FPGA Target               | XC7A200T                 |
+| ASIC Synthesis            | Yosys                    |
+| ASIC Flow                 | LibreLane 3.0.11         |
+| Physical Design           | OpenROAD                 |
+| PDK                       | SkyWater SKY130A         |
+| Standard Cells            | sky130\_fd\_sc\_hd       |
+| Layout Viewer             | KLayout                  |
+| Physical Verification     | Magic / KLayout / Netgen |
+| Environment               | Ubuntu / WSL             |
+| Container                 | Docker                   |
+
+---
+
+# 26. Final Project Status
+
+The final status of the project is:
+
+```
+RTL Specification          COMPLETE
+ALU Core                   PASS
+5-Stage Pipeline           PASS
+Functional Verification    PASS
+Randomized Verification    PASS
+Vivado Synthesis           PASS
+Vivado Timing              PASS
+Vivado Power               PASS
+
+ASIC Top-Level              COMPLETE
+SDC Constraints             COMPLETE
+Yosys Synthesis             PASS
+Floorplanning               COMPLETE
+Placement                   COMPLETE
+CTS                         COMPLETE
+Global Routing              COMPLETE
+Detailed Routing            COMPLETE
+Antenna Repair              COMPLETE
+
+DRC                         PASS
+LVS                         PASS
+Antenna                     PASS
+Power Grid                  PASS
+Hold STA                    PASS
+GDSII                       GENERATED
+
+Setup Timing @ 100 MHz      OPEN
+```
+
+---
+
+# 27. Final Result
+
+The project successfully demonstrates a complete **64-bit ALU RTL-to-GDSII implementation flow**.
+
+The final `alu64_cp` design provides:
+
+-  64-bit datapath 
+-  16 ALU operations 
+-  Arithmetic and logical operations 
+-  Shift operations 
+-  Signed comparisons 
+-  Carry handling 
+-  Overflow detection 
+-  Status flags 
+-  Five-stage pipelining 
+-  Five-cycle latency 
+-  Valid transaction propagation 
+-  Synchronous reset 
+-  ASIC synthesis 
+-  Physical implementation 
+-  Clock tree synthesis 
+-  Global and detailed routing 
+-  Antenna repair 
+-  DRC verification 
+-  LVS verification 
+-  Antenna verification 
+-  Power-grid analysis 
+-  Post-route STA 
+-  Final GDSII generation 
+
+The final implementation is **physically clean and GDSII-complete**, with DRC, LVS, antenna, power-grid, and hold checks passing.
+
+The remaining limitation is the **100 MHz setup timing target**, which is not fully closed in the final physical implementation. The critical timing paths are dominated by the deep combinational result-selection and decode logic between pipeline stages. Rather than changing the established five-stage architecture, the project preserves the verified architecture and documents the physical timing result as part of the final implementation.
+
+---
+
+# 29. Key Final Numbers
+
+```
+Design              : alu64_cp_top
+Architecture        : 5-stage pipelined 64-bit ALU
+Latency             : 5 cycles
+
+Technology          : SkyWater SKY130A
+Standard Cells      : sky130_fd_sc_hd
+
+Die Size            : 350 × 350 µm
+Die Area            : 122,500 µm²
+Instance Area       : 110,506 µm²
+Std-cell Area       : 53,035.9 µm²
+
+Total Power         : ~6.162 mW
+
+Route Wirelength    : ~217,570 µm
+Route Vias          : 38,822
+
+Setup WNS           : -4.812 ns
+Setup TNS           : -190.529 ns
+Hold WNS            : 0 ns
+
+DRC                 : PASS
+LVS                 : PASS
+Antenna             : PASS
+Power Grid          : 0 violations
+GDSII               : GENERATED
+```
+
+---
+
+# 30. Conclusion
+
+This project demonstrates the progression from a basic 64-bit combinational ALU to a clocked and pipelined implementation and finally to a physically implemented ASIC layout.
+
+The `alu64_cp` design was verified at the RTL level, synthesized using both FPGA and ASIC tools, implemented using the Sky130A technology, physically routed, and subjected to post-route physical verification.
+
+The final result is a complete **RTL-to-GDSII 5-stage pipelined 64-bit ALU implementation** with verified functionality and clean physical signoff checks, while transparently documenting the remaining setup-timing limitation at the original 100 MHz target.
+
+The project therefore provides a practical example of:
+
+```
+Digital Design
+      +
+RTL Verification
+      +
+Synthesis
+      +
+Physical Design
+      +
+Timing Analysis
+      +
+Physical Verification
+      +
+GDSII Generation
+```
+
+from a single SystemVerilog RTL design.
+
+
+

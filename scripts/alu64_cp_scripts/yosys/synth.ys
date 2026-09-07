@@ -1,0 +1,28 @@
+read_verilog -sv \
+  src/alu64_cp_pkg.sv \
+  src/alu64_cp_core.sv \
+  src/alu64_cp_pipeline.sv \
+  src/alu64_cp_top.sv
+
+hierarchy -top alu64_cp_top
+
+proc
+opt
+
+fsm
+memory
+opt
+
+techmap
+opt
+
+abc -liberty \
+  /root/.ciel/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056ea8b43078e71/sky130B/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+clean
+
+stat
+
+write_verilog \
+  -noattr \
+  build/yosys/alu64_cp_top_synth.v

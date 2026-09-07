@@ -6,7 +6,7 @@ The primary design, **`alu64_cp`**, is a clocked **5-stage pipelined** version o
 
 ---
 
-# 1. Project Overview
+# Project Overview
 
 The project progresses from a basic 64-bit combinational ALU to a complete ASIC implementation.
 
@@ -26,41 +26,27 @@ The project progresses from a basic 64-bit combinational ALU to a complete ASIC 
 
 ---
 
-# 2. Design Flow
+# Tools and Technologies
 
-```text
-ALU Specification
-      ↓
-64-bit Combinational ALU
-      ↓
-Clocked 5-Stage ALU
-      ↓
-RTL + Randomized Verification
-      ↓
-Vivado Synthesis / Timing / Power
-      ↓
-ASIC Integration + SDC
-      ↓
-Yosys Synthesis
-      ↓
-LibreLane + SKY130A
-      ↓
-Floorplan → Placement → CTS
-      ↓
-Global Route → Detailed Route
-      ↓
-Antenna Repair
-      ↓
-DRC / LVS / Antenna / Power Grid
-      ↓
-Post-Route STA
-      ↓
-GDSII
-```
+| CategoryTool / Technology |
+| ------------------------- |
+| RTL                       | SystemVerilog            |
+| RTL Simulation            | Icarus Verilog           |
+| FPGA Synthesis            | Xilinx Vivado 2025.1     |
+| FPGA Target               | XC7A200T                 |
+| ASIC Synthesis            | Yosys                    |
+| ASIC Flow                 | LibreLane 3.0.11         |
+| Physical Design           | OpenROAD                 |
+| PDK                       | SkyWater SKY130A         |
+| Standard Cells            | sky130_fd_sc_hd          |
+| Layout Viewer             | KLayout                  |
+| Physical Verification     | Magic / KLayout / Netgen |
+| Environment               | Ubuntu / WSL             |
+| Container                 | Docker                   |
 
 ---
 
-# 3. ALU Specification
+# ALU Specification
 
 ### Inputs
 
@@ -101,7 +87,7 @@ Additional support:
 
 ---
 
-# 4. `alu64_cp` Architecture
+# `alu64_cp` Architecture
 
 The main design is a **5-stage pipelined 64-bit ALU**.
 
@@ -149,7 +135,7 @@ carry_in ─────►│                          │
 
 ---
 
-# 5. Pipeline Interface
+# Pipeline Interface
 
 ### Inputs
 
@@ -178,13 +164,11 @@ Reset: **active-low synchronous**. Pipeline state, valid state, and registered o
 
 ---
 
-# 6. ALU Core Operations
+# ALU Core Operations
 
 ### Arithmetic
 
-Supports ADD, SUBTRACT, INCREMENT, and DECREMENT with explicit unsigned carry handling and signed overflow detection.
-
-For subtraction/decrement, `carry_out` represents the **no-borrow condition**.
+Supports ADD, SUBTRACT, INCREMENT, and DECREMENT with explicit unsigned carry handling and signed overflow detection. For subtraction/decrement, `carry_out` represents the **no-borrow condition**.
 
 ### Logic
 
@@ -228,7 +212,7 @@ Forwards either operand directly to the result.
 
 ---
 
-# 7. Verification
+# Verification
 
 Verification was performed at package, ALU-core, pipeline, and randomized levels.
 
@@ -272,7 +256,7 @@ ALU64_CP Step 6 randomized verification: ✅ PASS
 
 ---
 
-# 8. RTL Simulation
+# RTL Simulation
 
 RTL simulation used **Icarus Verilog** with SystemVerilog enabled using `-g2012`.
 
@@ -290,7 +274,7 @@ Equivalent verification was performed for the core, pipeline, and top-level desi
 
 ---
 
-# 9. FPGA-Oriented Verification and Analysis
+# FPGA-Oriented Verification and Analysis
 
 The design was synthesized and analyzed using **Xilinx Vivado 2025.1**.
 
@@ -325,7 +309,7 @@ The power estimate was vectorless with low confidence.
 
 ---
 
-# 10. ASIC Implementation
+# ASIC Implementation
 
 ASIC implementation used:
 
@@ -354,7 +338,7 @@ The PDK was supplied through the CIEL installation.
 
 ---
 
-# 11. ASIC Synthesis
+# ASIC Synthesis
 
 Yosys synthesized and mapped the RTL to the Sky130 standard-cell library.
 
@@ -384,7 +368,7 @@ Combinational     : 3282
 
 ---
 
-# 12. Timing Constraints
+# Timing Constraints
 
 A dedicated SDC was used for physical implementation and signoff.
 
@@ -409,7 +393,7 @@ SIGNOFF_SDC_FILE
 
 ---
 
-# 13. Physical Design Flow
+# Physical Design Flow
 
 ### Floorplanning
 
@@ -436,7 +420,7 @@ Antenna checking and repair were completed successfully.
 
 ---
 
-# 14. Final Physical Results
+# Final Physical Results
 
 Official frozen run:
 
@@ -467,7 +451,7 @@ RUN_2026-09-05_10-52-32
 
 ---
 
-# 15. Static Timing Analysis
+# Static Timing Analysis
 
 Post-route STA confirmed:
 
@@ -495,23 +479,15 @@ The critical path is primarily between the second and third pipeline stages and 
 
 The timing limitation is primarily due to **combinational depth and fanout** rather than clock skew.
 
-Approximate minimum clock period:
+Approximate minimum clock period: `14.81 ns`
 
-```text
-14.81 ns
-```
-
-Equivalent frequency:
-
-```text
-67.5 MHz
-```
+Equivalent frequency: `67.5 MHz`
 
 ⚠️ **Final status:** Functionally verified and physically signoff-clean, but **100 MHz setup timing is not closed**.
 
 ---
 
-# 16. Physical Verification
+# Physical Verification
 
 ### DRC
 
@@ -546,7 +522,7 @@ Approximately **0.03%** of nominal supply, with no reported power-grid violation
 
 ---
 
-# 17. Final GDSII
+# Final GDSII
 
 Final GDSII:
 
@@ -568,7 +544,7 @@ Magic GDS
 
 ---
 
-# 18. Final Layout
+# Final Layout
 
 The final `alu64_cp_top` layout can be viewed using **KLayout**.
 
@@ -584,7 +560,7 @@ It contains the complete physical implementation including standard cells, routi
 
 ---
 
-# 19. Recommended Project Images
+# Recommended Project Images
 
 ### RTL / Architecture
 
@@ -644,7 +620,7 @@ It contains the complete physical implementation including standard cells, routi
 
 ---
 
-# 20. Automation Scripts
+# Automation Scripts
 
 Reusable Python, Tcl, Yosys, and LibreLane scripts are provided for reproducible execution.
 
@@ -668,7 +644,7 @@ scripts/
 
 ---
 
-# 21. Python Automation
+# Python Automation
 
 Python scripts provide RTL verification, Yosys synthesis, PPA extraction, and reproducible execution.
 
@@ -680,7 +656,7 @@ python3 scripts/python/collect_ppa.py <LibreLane-run-directory>
 
 ---
 
-# 22. Vivado Tcl Automation
+# Vivado Tcl Automation
 
 ### Project Creation
 
@@ -698,7 +674,7 @@ These scripts automate Vivado project creation and synthesis/report generation.
 
 ---
 
-# 23. Yosys Automation
+# Yosys Automation
 
 Synthesis script:
 
@@ -710,7 +686,7 @@ It elaborates and maps the RTL to the Sky130 standard-cell library.
 
 ---
 
-# 24. LibreLane Configuration
+# LibreLane Configuration
 
 Final configuration:
 
@@ -722,27 +698,7 @@ Defines the design, RTL sources, PDK, standard cells, clock, timing, synthesis s
 
 ---
 
-# 25. Tools and Technologies
-
-| CategoryTool / Technology |
-| ------------------------- |
-| RTL                       | SystemVerilog            |
-| RTL Simulation            | Icarus Verilog           |
-| FPGA Synthesis            | Xilinx Vivado 2025.1     |
-| FPGA Target               | XC7A200T                 |
-| ASIC Synthesis            | Yosys                    |
-| ASIC Flow                 | LibreLane 3.0.11         |
-| Physical Design           | OpenROAD                 |
-| PDK                       | SkyWater SKY130A         |
-| Standard Cells            | sky130_fd_sc_hd          |
-| Layout Viewer             | KLayout                  |
-| Physical Verification     | Magic / KLayout / Netgen |
-| Environment               | Ubuntu / WSL             |
-| Container                 | Docker                   |
-
----
-
-# 26. Final Project Status
+# Final Project Status
 
 ```text
 RTL Specification          COMPLETE
@@ -776,7 +732,7 @@ Setup Timing @ 100 MHz      ⚠️ OPEN
 
 ---
 
-# 27. Final Result
+# Final Result
 
 The project demonstrates a complete **64-bit ALU RTL-to-GDSII flow**.
 
@@ -805,7 +761,7 @@ The only open item is the **100 MHz setup target**, with critical paths dominate
 
 ---
 
-# 28. Key Final Numbers
+# Key Final Numbers
 
 ```text
 Design              : alu64_cp_top
@@ -838,7 +794,7 @@ GDSII               : ✅ GENERATED
 
 ---
 
-# 29. Conclusion
+# Conclusion
 
 This project demonstrates the complete progression from a **64-bit combinational ALU** to a **clocked 5-stage pipelined ALU** and finally to a physically implemented **Sky130A ASIC layout**.
 

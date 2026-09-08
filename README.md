@@ -60,47 +60,6 @@ The project progresses from a basic 64-bit combinational ALU to a complete ASIC 
 
 ---
 
-# ALU Specification
-
-### Inputs
-
-```text
-operand_a[63:0]
-operand_b[63:0]
-cmd[3:0]
-carry_in
-```
-
-The ALU supports 16 operations:
-
-| Opcode | Operations |
-| --------------- | ---------------------- |
-| `0000`          | ADD                    |
-| `0001`          | SUBTRACT               |
-| `0010`          | AND                    |
-| `0011`          | OR                     |
-| `0100`          | XOR                    |
-| `0101`          | NOT                    |
-| `0110`          | SHIFT LEFT             |
-| `0111`          | SHIFT RIGHT            |
-| `1000`          | ARITHMETIC SHIFT RIGHT |
-| `1001`          | COMPARE EQUAL          |
-| `1010`          | COMPARE LESS           |
-| `1011`          | COMPARE GREATER        |
-| `1100`          | INCREMENT              |
-| `1101`          | DECREMENT              |
-| `1110`          | PASS A                 |
-| `1111`          | PASS B                 |
-
-Additional support:
-
-- Carry input/output
-- Zero, negative, and overflow flags
-- Signed comparisons
-- No-borrow carry semantics for subtraction/decrement
-
----
-
 # `alu64_cp` Architecture
 
 The main design is a **5-stage pipelined 64-bit ALU**.
@@ -118,50 +77,9 @@ The main design is a **5-stage pipelined 64-bit ALU**.
   <\tr>
 </table>
 
-
-<table align="center">
-  <tr>
-    <td align="center">
-          <img width="1029" height="800" alt="6T-SRAM VTC curve" src="https://github.com/user-attachments/assets/c3721968-3fc7-4e52-8e0a-c206ae93c62a" /><br/>
-      <small>Fig 6a. 6T-SRAM VTC curve</small>
-    </td>
-    <td align="center">
-          <img width="1006" height="800" alt="7T-SRAM VTC curve (2)" src="https://github.com/user-attachments/assets/e914d85d-c8d4-44e4-8451-588d62d2290b" /><br/>
-      <small>Fig 6b. 7T-SRAM VTC curve</small>
-    </td>
-  </tr>
-</table>
-
 **Latency:** 5 clock cycles.
 
 `valid_in` propagates with each transaction and produces the corresponding `valid_out`.
-
----
-
-# Pipeline Interface
-
-### Inputs
-
-```text
-clk
-rst_n
-valid_in
-operand_a[63:0]
-operand_b[63:0]
-cmd[3:0]
-carry_in
-```
-
-### Outputs
-
-```text
-valid_out
-result[63:0]
-carry_out
-zero_flag
-negative_flag
-overflow_flag
-```
 
 Reset: **active-low synchronous**. Pipeline state, valid state, and registered outputs are cleared during reset.
 
@@ -327,11 +245,7 @@ Ubuntu / WSL
 Docker
 ```
 
-Docker image:
-
-```text
-ghcr.io/librelane/librelane:3.0.11
-```
+Docker image: `ghcr.io/librelane/librelane:3.0.11`
 
 The PDK was supplied through the CIEL installation.
 
@@ -401,60 +315,46 @@ SIGNOFF_SDC_FILE
 Die Area = 122,500 µm²
 ```
 
-### Placement
+### Placement (Standard cells were placed within the core region with timing-aware optimization where applicable ✅)
 
-Standard cells were placed within the core region with timing-aware optimization where applicable.
+### Clock Tree Synthesis (CTS generated and analyzed the clock network for the 5-stage pipeline ✅)
 
-### Clock Tree Synthesis
+### Routing (Global and detailed routing were completed successfully ✅)
 
-CTS generated and analyzed the clock network for the 5-stage pipeline.
-
-### Routing
-
-Global and detailed routing were completed successfully.
-
-### Antenna Repair
-
-Antenna checking and repair were completed successfully.
+### Antenna Repair (Antenna checking and repair were completed successfully ✅)
 
 ---
 
 # Final Physical Results
 
-Official frozen run:
+Official frozen run: `RUN_2026-09-05_10-52-32`
 
-```text
-RUN_2026-09-05_10-52-32
-```
-
-| Parameters | Final Result |
-| --------------------- | ------------ |
-| RTL                   | V11          |
-| Pipeline              | 5-stage      |
-| Latency               | 5 cycles     |
-| Die Size              | 350 × 350 µm |
-| Die Area              | 122,500 µm²  |
-| Instance Area         | 110,506 µm²  |
-| Standard-cell Area    | 53,035.9 µm² |
-| Total Power           | 6.162 mW     |
-| Route Wirelength      | 217,570 µm   |
-| Route Vias            | 38,822       |
-| Setup WNS             | -4.812 ns    |
-| Setup TNS             | -190.529 ns  |
-| Hold WNS              | 0 ns         |
-| DRC                   | PASS         |
-| LVS                   | PASS         |
-| Antenna               | PASS         |
-| Power Grid            | PASS         |
-| GDSII                 | Generated    |
+| Parameters | Final Result | Review |
+| --------------------- | ------------ | ------------ |
+| RTL | V11 | Final frozen RTL candidate |
+| Pipeline | 5-stage | Balanced latency and complexity |
+| Latency | 5 cycles | Fixed and deterministic |
+| Die Size | 350 × 350 µm | Fixed implementation die |
+| Die Area | 122,500 µm² | Defined by selected die dimensions |
+| Instance Area | 110,506 µm² | Final placed design area |
+| Standard-cell Area | 53,035.9 µm² | Area occupied by active standard cells |
+| Total Power | 6.162 mW | Low post-route power estimate |
+| Route Wirelength | 217,570 µm | Final routed interconnect length |
+| Route Vias | 38,822 | Final routed via count |
+| Setup WNS | -4.812 ns | 100 MHz target not timing-closed |
+| Setup TNS | -190.529 ns | Setup violations remain across critical paths |
+| Hold WNS | 0 ns | No hold violations |
+| DRC | PASS | Layout is DRC clean |
+| LVS | PASS | Layout matches the synthesized netlist |
+| Antenna | PASS | No antenna violations |
+| Power Grid | PASS | No power-grid violations reported |
+| GDSII | Generated | Final physical layout successfully exported |
 
 ---
 
 # Static Timing Analysis
 
-Post-route STA confirmed: `Hold timing: ✅ PASS`
-
-No hold violations were reported.
+Post-route STA confirmed: `Hold timing: ✅ PASS`. No hold violations were reported.
 
 The 100 MHz setup target remains open:
 
@@ -521,12 +421,13 @@ It contains the complete physical implementation including standard cells, routi
 
 > **[Insert KLayout screenshot here]**
 
-```text
-[ PROJECT IMAGE / KLAYOUT SCREENSHOT ]
-```
-
----
-
+<table align="center">
+<td align="center">
+      <img width="1117" height="851" alt="layout_ss2" src="https://github.com/user-attachments/assets/14b75020-a12a-4063-bd8a-a25b78fb1325" /><br/>
+      <small>Fig. `alu64_cp` layout</small>
+    </td>
+</table>
+    
 # Recommended Project Images
 
 ### RTL / Architecture

@@ -9,12 +9,10 @@
 [![Synthesis](https://img.shields.io/badge/Synthesis-Yosys-orange)](#)
 [![ASIC Flow](https://img.shields.io/badge/ASIC%20Flow-LibreLane%20%7C%20OpenROAD-orange)](#)
 [![PDK](https://img.shields.io/badge/PDK-SKY130A-red)](#)
-[![Power](https://img.shields.io/badge/Power-~6.16%20mW-yellow)](#)
 [![DRC](https://img.shields.io/badge/DRC-0%20Violations-brightgreen)](#)
 [![LVS](https://img.shields.io/badge/LVS-PASS-brightgreen)](#)
 [![Antenna](https://img.shields.io/badge/Antenna-0%20Violations-brightgreen)](#)
 [![GDSII](https://img.shields.io/badge/GDSII-Generated-success)](#)
-[![Timing](https://img.shields.io/badge/Setup%20WNS--4.81%20ns-orange)](#)
 
 A complete **RTL-to-GDSII digital ASIC implementation** of a **64-bit ALU**, covering RTL design, functional/randomized verification, FPGA synthesis, ASIC synthesis, physical design, STA, physical verification, and GDSII generation using **SkyWater SKY130A**.
 

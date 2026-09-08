@@ -308,20 +308,15 @@ SIGNOFF_SDC_FILE
 
 # Physical Design Flow
 
-### Floorplanning
+- Floorplanning (`Die Area = 350 µm × 350 µm = 122,500 µm²`)
 
-```text
-350 µm × 350 µm
-Die Area = 122,500 µm²
-```
+- Placement (Standard cells were placed within core region with timing-aware optimization where applicable ✅)
 
-### Placement (Standard cells were placed within core region with timing-aware optimization where applicable ✅)
+- Clock Tree Synthesis (CTS generated and analyzed the clock network for the 5-stage pipeline ✅)
 
-### Clock Tree Synthesis (CTS generated and analyzed the clock network for the 5-stage pipeline ✅)
+- Routing (Global and detailed routing were completed successfully ✅)
 
-### Routing (Global and detailed routing were completed successfully ✅)
-
-### Antenna Repair (Antenna checking and repair were completed successfully ✅)
+- Antenna Repair (Antenna checking and repair were completed successfully ✅)
 
 ---
 
@@ -383,40 +378,21 @@ Equivalent frequency: `67.5 MHz`
 
 # Physical Verification
 
-### DRC `DRC: ✅ PASS`
+- DRC: `DRC: ✅ PASS`
 
-### LVS `Circuits match uniquely. LVS: ✅ PASS`
+- LVS: `Circuits match uniquely. LVS: ✅ PASS`
 
-### Antenna `Violating nets : 0, Violating pins : 0 and Antenna: ✅ PASS`
+- Antenna: `Violating nets : 0, Violating pins : 0 and Antenna: ✅ PASS`
 
-### Power Grid ` VPWR worst drop : 0.594 mV, VGND worst drop : 0.493 mV`. Approximately **0.03%** of nominal supply, with no reported power-grid violations.
+- Power Grid: ` VPWR worst drop : 0.594 mV, VGND worst drop : 0.493 mV`. Approximately **0.03%** of nominal supply, with no reported power-grid violations.
 
 ---
 
-# Final GDSII
+# Final GDSII Layout
 
 Final GDSII: `runs/RUN_2026-09-05_10-52-32/final/gds/alu64_cp_top.gds`
 
-Related physical views include:
-
-```text
-DEF
-GDS
-LEF
-SPICE
-Netlists
-KLayout GDS
-Magic GDS
-```
-
----
-
-# Final Layout
-
 The final `alu64_cp_top` layout can be viewed using **KLayout**. It contains the complete physical implementation including standard cells, routing, power structures, clock network, I/O connectivity, hierarchy, and technology layers.
-
-
-
     
 # Recommended Project Images
 
@@ -482,62 +458,6 @@ The final `alu64_cp_top` layout can be viewed using **KLayout**. It contains the
 
 ---
 
-# Automation Scripts
-
-Reusable Python, Tcl, Yosys, and LibreLane scripts are provided for reproducible execution.
-
-```text
-scripts/
-├── python/
-│   ├── run_rtl_verify.py
-│   ├── run_yosys.py
-│   └── collect_ppa.py
-│
-├── tcl/
-│   ├── vivado_create_project.tcl
-│   └── vivado_synth_reports.tcl
-│
-├── yosys/
-│   └── synth.ys
-│
-└── librelane/
-    └── config_v11_final.yaml
-```
-
----
-
-# Python Automation
-
-Python scripts provide RTL verification, Yosys synthesis, PPA extraction, and reproducible execution.
-
-```bash
-python3 scripts/python/run_rtl_verify.py
-python3 scripts/python/run_yosys.py
-python3 scripts/python/collect_ppa.py <LibreLane-run-directory>
-```
-
-# Vivado Tcl Automation
-
-### Project Creation `scripts/tcl/vivado_create_project.tcl`
-
-### Synthesis and Reports `scripts/tcl/vivado_synth_reports.tcl`
-
-These scripts automate Vivado project creation and synthesis/report generation.
-
-# Yosys Automation
-
-Synthesis script: `scripts/yosys/synth.ys`
-
-It elaborates and maps the RTL to the Sky130 standard-cell library.
-
-# LibreLane Configuration
-
-Final configuration: `scripts/librelane/config_v11_final.yaml`
-
-Defines the design, RTL sources, PDK, standard cells, clock, timing, synthesis strategy, die dimensions, PNR/signoff SDC, and post-route optimization settings.
-
----
-
 # Final Project Status
 
 ```text
@@ -555,10 +475,10 @@ SDC Constraints            COMPLETE
 Yosys Synthesis            ✅ PASS
 Floorplanning              COMPLETE
 Placement                  COMPLETE
-CTS                         COMPLETE
+CTS                        COMPLETE
 Global Routing             COMPLETE
-Detailed Routing            COMPLETE
-Antenna Repair              COMPLETE
+Detailed Routing           COMPLETE
+Antenna Repair             COMPLETE
 
 DRC                         ✅ PASS
 LVS                         ✅ PASS

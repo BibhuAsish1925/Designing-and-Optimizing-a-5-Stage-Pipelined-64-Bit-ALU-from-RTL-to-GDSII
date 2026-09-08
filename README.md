@@ -446,34 +446,37 @@ The final `alu64_cp_top` layout can be viewed using **KLayout**. It contains the
 
 ### ASIC Floorplan
 
-> **[Insert floorplan screenshot here]**
-
-```text
-[ IMAGE PLACEHOLDER ]
-```
+<table align="center">
+<td align="center">
+      <img width="883" height="887" alt="floorplanning_ss2" src="https://github.com/user-attachments/assets/e895e0f6-427e-4e12-86b0-e46482ad5faf" /><br/>
+      <small>Fig. alu64_cp Floorplanning </small>
+    </td>
+</table>
 
 ### Placement
 
-> **[Insert placement screenshot here]**
-
-```text
-[ IMAGE PLACEHOLDER ]
-```
+<table align="center">
+<td align="center">
+      <img width="934" height="887" alt="placement_ss2" src="https://github.com/user-attachments/assets/4fd39cfa-af8e-432c-a168-c8ddfb9c15e3" /><br/>
+      <small>Fig. alu64_cp Placement</small>
+    </td>
+</table>
 
 ### Routing
 
-> **[Insert routed layout screenshot here]**
-
-```text
-[ IMAGE PLACEHOLDER ]
-```
+<table align="center">
+<td align="center">
+      <img width="921" height="890" alt="routing_ss2" src="https://github.com/user-attachments/assets/d6ed4d1e-e8d1-4642-9c77-bfb21ca01b92" /><br/>
+      <small>Fig. alu64_cp Routing</small>
+    </td>
+</table>
 
 ### Final GDSII
 
 <table align="center">
 <td align="center">
       <img width="1117" height="851" alt="layout_ss2" src="https://github.com/user-attachments/assets/14b75020-a12a-4063-bd8a-a25b78fb1325" /><br/>
-      <small>Fig. alu64_cp layout</small>
+      <small>Fig. alu64_cp final GDSII layout</small>
     </td>
 </table>
 

@@ -106,12 +106,31 @@ Additional support:
 The main design is a **5-stage pipelined 64-bit ALU**.
 
 <table align="center">
+    <tr>
     <td align="center">
       <img width="1536" height="1024" alt="alu64_cp" src="https://github.com/user-attachments/assets/eab71580-7b59-4e73-990d-d46a602964e3" /><br/>
       <small>Fig. `alu64_cp` Architecture</small>
     </td>
+    <td align="center">
+      <img width="347" height="762" alt="image" src="https://github.com/user-attachments/assets/e4195d4e-5ce5-4ce5-ad2d-11c38d307c9a" /><br/>
+      <small>Fig. all 16 upcodes </small>
+    </td>
+  <\tr>
 </table>
 
+
+<table align="center">
+  <tr>
+    <td align="center">
+          <img width="1029" height="800" alt="6T-SRAM VTC curve" src="https://github.com/user-attachments/assets/c3721968-3fc7-4e52-8e0a-c206ae93c62a" /><br/>
+      <small>Fig 6a. 6T-SRAM VTC curve</small>
+    </td>
+    <td align="center">
+          <img width="1006" height="800" alt="7T-SRAM VTC curve (2)" src="https://github.com/user-attachments/assets/e914d85d-c8d4-44e4-8451-588d62d2290b" /><br/>
+      <small>Fig 6b. 7T-SRAM VTC curve</small>
+    </td>
+  </tr>
+</table>
 
 **Latency:** 5 clock cycles.
 

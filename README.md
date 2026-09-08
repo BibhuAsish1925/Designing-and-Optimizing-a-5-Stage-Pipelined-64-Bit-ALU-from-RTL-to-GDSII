@@ -105,43 +105,13 @@ Additional support:
 
 The main design is a **5-stage pipelined 64-bit ALU**.
 
-```text
-                ┌──────────────────────────┐
-operand_a ────►│        Stage 1           │
-operand_b ────►│      Input Capture       │
-cmd ──────────►│                          │
-carry_in ─────►│                          │
-                └────────────┬─────────────┘
-                             ↓
-                ┌──────────────────────────┐
-                │        Stage 2           │
-                │ Operand / Command Regs   │
-                └────────────┬─────────────┘
-                             ↓
-                ┌──────────────────────────┐
-                │         ALU Core         │
-                │ Arithmetic / Logic /     │
-                │ Shift / Compare / Pass   │
-                └────────────┬─────────────┘
-                             ↓
-                ┌──────────────────────────┐
-                │        Stage 3           │
-                │ Result / Carry /         │
-                │ Overflow Registers       │
-                └────────────┬─────────────┘
-                             ↓
-                ┌──────────────────────────┐
-                │        Stage 4           │
-                │    Flag Generation       │
-                └────────────┬─────────────┘
-                             ↓
-                ┌──────────────────────────┐
-                │        Stage 5           │
-                │    Output Registers      │
-                └────────────┬─────────────┘
-                             ↓
-                    Registered Outputs
-```
+<table align="center">
+    <td align="center">
+      <img width="1536" height="1024" alt="alu64_cp" src="https://github.com/user-attachments/assets/eab71580-7b59-4e73-990d-d46a602964e3" /><br/>
+      <small>Fig. `alu64_cp` Architecture</small>
+    </td>
+</table>
+
 
 **Latency:** 5 clock cycles.
 
@@ -292,11 +262,7 @@ Equivalent verification was performed for the core, pipeline, and top-level desi
 
 The design was synthesized and analyzed using **Xilinx Vivado 2025.1**.
 
-Target:
-
-```text
-xc7a200tfbg676-2
-```
+Target: `xc7a200tfbg676-2`
 
 Vivado was used for RTL synthesis, utilization, timing, and power estimation.
 

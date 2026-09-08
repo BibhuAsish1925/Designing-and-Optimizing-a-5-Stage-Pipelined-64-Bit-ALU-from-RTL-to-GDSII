@@ -315,7 +315,7 @@ SIGNOFF_SDC_FILE
 Die Area = 122,500 µm²
 ```
 
-### Placement (Standard cells were placed within the core region with timing-aware optimization where applicable ✅)
+### Placement (Standard cells were placed within core region with timing-aware optimization where applicable ✅)
 
 ### Clock Tree Synthesis (CTS generated and analyzed the clock network for the 5-stage pipeline ✅)
 
@@ -413,20 +413,10 @@ Magic GDS
 
 # Final Layout
 
-The final `alu64_cp_top` layout can be viewed using **KLayout**.
+The final `alu64_cp_top` layout can be viewed using **KLayout**. It contains the complete physical implementation including standard cells, routing, power structures, clock network, I/O connectivity, hierarchy, and technology layers.
 
-It contains the complete physical implementation including standard cells, routing, power structures, clock network, I/O connectivity, hierarchy, and technology layers.
 
-### Final GDSII Layout
 
-> **[Insert KLayout screenshot here]**
-
-<table align="center">
-<td align="center">
-      <img width="1117" height="851" alt="layout_ss2" src="https://github.com/user-attachments/assets/14b75020-a12a-4063-bd8a-a25b78fb1325" /><br/>
-      <small>Fig. `alu64_cp` layout</small>
-    </td>
-</table>
     
 # Recommended Project Images
 
@@ -480,11 +470,12 @@ It contains the complete physical implementation including standard cells, routi
 
 ### Final GDSII
 
-> **[Insert final KLayout GDSII screenshot here]**
-
-```text
-[ IMAGE PLACEHOLDER ]
-```
+<table align="center">
+<td align="center">
+      <img width="1117" height="851" alt="layout_ss2" src="https://github.com/user-attachments/assets/14b75020-a12a-4063-bd8a-a25b78fb1325" /><br/>
+      <small>Fig. alu64_cp layout</small>
+    </td>
+</table>
 
 ---
 

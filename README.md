@@ -1,5 +1,21 @@
 # Designing and Optimizing a 5-Stage Pipelined 64-Bit ALU from RTL to GDSII
 
+[![Architecture](https://img.shields.io/badge/Architecture-5--Stage%20Pipeline-blue)](#)
+[![HDL](https://img.shields.io/badge/HDL-SystemVerilog-purple)](#)
+[![Data Width](https://img.shields.io/badge/Data%20Width-64--bit-blueviolet)](#)
+[![Operations](https://img.shields.io/badge/ALU%20Operations-16-green)](#)
+[![Latency](https://img.shields.io/badge/Latency-5%20Cycles-blue)](#)
+[![Verification](https://img.shields.io/badge/Verification-1184%2F1184%20PASS-brightgreen)](#)
+[![Synthesis](https://img.shields.io/badge/Synthesis-Yosys-orange)](#)
+[![ASIC Flow](https://img.shields.io/badge/ASIC%20Flow-LibreLane%20%7C%20OpenROAD-orange)](#)
+[![PDK](https://img.shields.io/badge/PDK-SKY130A-red)](#)
+[![Power](https://img.shields.io/badge/Power-~6.16%20mW-yellow)](#)
+[![DRC](https://img.shields.io/badge/DRC-0%20Violations-brightgreen)](#)
+[![LVS](https://img.shields.io/badge/LVS-PASS-brightgreen)](#)
+[![Antenna](https://img.shields.io/badge/Antenna-0%20Violations-brightgreen)](#)
+[![GDSII](https://img.shields.io/badge/GDSII-Generated-success)](#)
+[![Timing](https://img.shields.io/badge/Setup%20WNS--4.81%20ns-orange)](#)
+
 A complete **RTL-to-GDSII digital ASIC implementation** of a **64-bit ALU**, covering RTL design, functional/randomized verification, FPGA synthesis, ASIC synthesis, physical design, STA, physical verification, and GDSII generation using **SkyWater SKY130A**.
 
 The primary design, **`alu64_cp`**, is a clocked **5-stage pipelined** version of the original combinational `alu64`.

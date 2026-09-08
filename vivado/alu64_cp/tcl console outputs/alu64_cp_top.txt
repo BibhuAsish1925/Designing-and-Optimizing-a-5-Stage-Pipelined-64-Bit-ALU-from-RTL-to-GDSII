@@ -1,0 +1,28 @@
+# run 1000ns
+
+===============================================
+       ALU64_CP TOP-LEVEL INTEGRATION TEST
+===============================================
+PASS | CMD=0000 | RESULT=000000000000001e | C=0 Z=0 N=0 V=0
+PASS | CMD=0001 | RESULT=000000000000001e | C=1 Z=0 N=0 V=0
+PASS | CMD=0010 | RESULT=0f0f00000f0f0000 | C=0 Z=0 N=0 V=0
+PASS | CMD=0100 | RESULT=f0f00f0ff0f00f0f | C=0 Z=0 N=1 V=0
+PASS | CMD=0110 | RESULT=0000000000000100 | C=0 Z=0 N=0 V=0
+PASS | CMD=1000 | RESULT=fffffffffffffffc | C=0 Z=0 N=1 V=0
+PASS | CMD=1001 | RESULT=0000000000000001 | C=0 Z=0 N=0 V=0
+PASS | CMD=1100 | RESULT=0000000000000064 | C=0 Z=0 N=0 V=0
+PASS | CMD=1101 | RESULT=0000000000000063 | C=1 Z=0 N=0 V=0
+PASS | CMD=1110 | RESULT=123456789abcdef0 | C=0 Z=0 N=0 V=0
+PASS | CMD=1111 | RESULT=2222222222222222 | C=0 Z=0 N=0 V=0
+
+===============================================
+          ALU64_CP TOP TEST RESULT
+===============================================
+Tests  : 11
+Passed : 11
+Failed : 0
+===============================================
+ALU64_CP top-level test: PASS
+===============================================
+
+$finish called at time : 566 ns

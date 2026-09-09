@@ -65,7 +65,7 @@ The project progresses from a basic 64-bit combinational ALU to a complete ASIC 
 The main design is a **5-stage pipelined 64-bit ALU**.
 
 <table align="center">
-    <tr>
+  <tr>
     <td align="center">
       <img width="1536" height="1024" alt="alu64_cp" src="https://github.com/user-attachments/assets/eab71580-7b59-4e73-990d-d46a602964e3" /><br/>
       <small>Fig. `alu64_cp` Architecture</small>
@@ -396,20 +396,22 @@ The final `alu64_cp_top` layout can be viewed using **KLayout**. It contains the
     
 # Recommended Project Images
 
-### RTL / Architecture
+### RTL Schematic / Architecture
 
 <table align="center">
     <tr>
     <td align="center">
-      <img width="1536" height="1024" alt="alu64_cp" src="https://github.com/user-attachments/assets/eab71580-7b59-4e73-990d-d46a602964e3" /><br/>
-      <small>Fig. alu64_cp Architecture</small>
-    </td>
-    <td align="center">
       <img width="377" height="1060" alt="image" src="https://github.com/user-attachments/assets/cf1651b5-ad96-43ca-9162-99784d9e621d" /><br/>
       <small>Fig. vivado synthesis design </small>
     </td>
+    <td align="center">
+      <img width="500" height="1025" alt="image" src="https://github.com/user-attachments/assets/ffadcce0-f305-4315-8a81-46cfedb2a533" /><br/>
+      <small>Fig. vivado implementation design </small>
+    </td>
   <\tr>
 </table>
+
+---
 
 ### RTL Simulation
 
@@ -419,6 +421,8 @@ The final `alu64_cp_top` layout can be viewed using **KLayout**. It contains the
       <small>Fig. alu64_cp rtl simulations</small>
     </td>
 </table>
+
+---
 
 ### Vivado Results
 
@@ -455,6 +459,7 @@ The final `alu64_cp_top` layout can be viewed using **KLayout**. It contains the
   </tr>
 </table>
 
+---
 
 ### ASIC Floorplan
 
@@ -465,6 +470,8 @@ The final `alu64_cp_top` layout can be viewed using **KLayout**. It contains the
     </td>
 </table>
 
+---
+
 ### Placement
 
 <table align="center">
@@ -474,6 +481,8 @@ The final `alu64_cp_top` layout can be viewed using **KLayout**. It contains the
     </td>
 </table>
 
+---
+
 ### Routing
 
 <table align="center">
@@ -482,6 +491,8 @@ The final `alu64_cp_top` layout can be viewed using **KLayout**. It contains the
       <small>Fig. alu64_cp Routing</small>
     </td>
 </table>
+
+---
 
 ### Final GDSII
 

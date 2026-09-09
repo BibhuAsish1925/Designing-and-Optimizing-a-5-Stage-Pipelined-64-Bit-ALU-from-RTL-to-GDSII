@@ -42,21 +42,22 @@ The project progresses from a basic 64-bit combinational ALU to a complete ASIC 
 
 # Tools and Technologies
 
-| CategoryTool | Technology | 
-| ------------------------- | ------------------------ |
-| RTL                       | SystemVerilog            |
-| RTL Simulation            | Icarus Verilog           |
-| FPGA Synthesis            | Xilinx Vivado 2025.1     |
-| FPGA Target               | XC7A200T                 |
-| ASIC Synthesis            | Yosys                    |
-| ASIC Flow                 | LibreLane 3.0.11         |
-| Physical Design           | OpenROAD                 |
-| PDK                       | SkyWater SKY130A         |
-| Standard Cells            | sky130_fd_sc_hd          |
-| Layout Viewer             | KLayout                  |
-| Physical Verification     | Magic / KLayout / Netgen |
-| Environment               | Ubuntu / WSL             |
-| Container                 | Docker                   |
+| Category | Technology / Configuration | Comments |
+|---|---|---|
+| **RTL** | SystemVerilog | Hardware description and RTL design |
+| **RTL Simulation** | Icarus Verilog | Functional and randomized RTL verification |
+| **FPGA Synthesis** | Xilinx Vivado 2025.1 | RTL synthesis, utilization, timing, and power analysis |
+| **FPGA Target** | `xc7a200tfbg676-2` | Target FPGA device for synthesis analysis |
+| **ASIC Synthesis** | Yosys | RTL-to-gate-level synthesis |
+| **ASIC Flow** | LibreLane 3.0.11 / OpenROAD | Automated ASIC physical implementation flow |
+| **PDK** | SkyWater SKY130A | Open-source 130 nm CMOS process design kit |
+| **Standard Cells** | `sky130_fd_sc_hd` | High-density standard-cell library |
+| **PDK Installation** | CIEL | PDK and technology setup for the ASIC flow |
+| **Layout Viewer** | KLayout | GDSII layout inspection and visualization |
+| **Physical Verification** | Magic / KLayout / Netgen | DRC, layout verification, and LVS |
+| **Environment** | Ubuntu / WSL | Linux-based ASIC development environment |
+| **Container** | Docker | Reproducible ASIC tool environment |
+| **Container Image** | `ghcr.io/librelane/librelane:3.0.11` | Containerized LibreLane environment |
 
 ---
 
@@ -176,22 +177,6 @@ The design was synthesized and analyzed using **Xilinx Vivado 2025.1** targeting
 | Timing @ 100 MHz | Setup/Hold Positive |
 
 > **Note:** Power was estimated using a vectorless analysis with low confidence.
-
-
-
----
-
-# ASIC Implementation
-
-| Category | Configuration |
-|---|---|
-| **Synthesis** | Yosys |
-| **ASIC Flow** | LibreLane 3.0.11 / OpenROAD |
-| **Technology** | SkyWater SKY130A |
-| **Standard-Cell Library** | `sky130_fd_sc_hd` |
-| **Environment** | Ubuntu / WSL + Docker |
-| **Container Image** | `ghcr.io/librelane/librelane:3.0.11` |
-| **PDK Installation** | CIEL |
 
 ---
 
@@ -464,3 +449,11 @@ GDSII Generation
 **GDSII Generation: COMPLETE**
 
 **100 MHz Setup Timing: ⚠️ OPEN**
+
+## Author
+
+**Bibhu Asish Panda**  
+Electronics / VLSI / Digital Design Enthusiast
+
+[GitHub](https://github.com/BibhuAsish1925) ·
+[LinkedIn](www.linkedin.com/in/bibhu-asish-panda-05332b288)

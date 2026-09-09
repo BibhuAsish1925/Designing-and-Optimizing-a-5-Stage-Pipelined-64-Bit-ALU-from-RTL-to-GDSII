@@ -398,27 +398,63 @@ The final `alu64_cp_top` layout can be viewed using **KLayout**. It contains the
 
 ### RTL / Architecture
 
-> **[Insert 5-stage pipeline architecture diagram here]**
-
-```text
-[ IMAGE PLACEHOLDER ]
-```
+<table align="center">
+    <tr>
+    <td align="center">
+      <img width="1536" height="1024" alt="alu64_cp" src="https://github.com/user-attachments/assets/eab71580-7b59-4e73-990d-d46a602964e3" /><br/>
+      <small>Fig. alu64_cp Architecture</small>
+    </td>
+    <td align="center">
+      <img width="377" height="1060" alt="image" src="https://github.com/user-attachments/assets/cf1651b5-ad96-43ca-9162-99784d9e621d" /><br/>
+      <small>Fig. vivado synthesis design </small>
+    </td>
+  <\tr>
+</table>
 
 ### RTL Simulation
 
-> **[Insert RTL simulation waveform here]**
-
-```text
-[ IMAGE PLACEHOLDER ]
-```
+<table align="center">
+<td align="center">
+      <img width="1357" height="917" alt="image" src="https://github.com/user-attachments/assets/895f6737-8273-403e-971b-32bbc97899aa" /><br/>
+      <small>Fig. alu64_cp rtl simulations</small>
+    </td>
+</table>
 
 ### Vivado Results
 
-> **[Insert Vivado utilization/timing screenshot here]**
+<table>
+  <tr>
+    <td align="center">
+      <img width="1200" height="545" alt="power_rpt (2)" src="https://github.com/user-attachments/assets/8b59c297-d9e9-42ce-a738-41e113d99890" /><br/>
+      <small>Power summary (synthesis)</small>
+    </td>
+    <td align="center">
+      <img width="1200" height="558" alt="power_rpt (2)" src="https://github.com/user-attachments/assets/955ba506-330b-41ad-aa87-6002c778b878" /><br/>
+      <small>Power summary (implementation)</small>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img width="1877" height="540" alt="timing_rpt (2)" src="https://github.com/user-attachments/assets/138d0041-ee02-4820-a694-cd9f1695dda4" /><br/>
+      <small>Timing Summary (synthesis)</small>
+    </td>
+    <td align="center">
+      <img width="2236" height="540" alt="timing_rpt (2)" src="https://github.com/user-attachments/assets/2cd667a6-0b92-45e9-8a98-c578f26bd7a8" /><br/>
+      <small>Timing Summary (implementation)</small>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img width="961" height="540" alt="utilization_summary (2)" src="https://github.com/user-attachments/assets/056b3cd3-76e4-45c6-bfb3-29b4001bf615" /><br/>
+      <small>Utilization summary (synthesis)</small>
+    </td>
+    <td align="center">
+      <img width="969" height="540" alt="utilization_rpt (2)" src="https://github.com/user-attachments/assets/33b401e1-e87f-47c6-b320-a250dc66642c" /><br/>
+      <small>Utilization summary (implementation)</small>
+    </td>
+  </tr>
+</table>
 
-```text
-[ IMAGE PLACEHOLDER ]
-```
 
 ### ASIC Floorplan
 

@@ -74,7 +74,7 @@ The main design is a **5-stage pipelined 64-bit ALU**.
       <img width="347" height="762" alt="image" src="https://github.com/user-attachments/assets/e4195d4e-5ce5-4ce5-ad2d-11c38d307c9a" /><br/>
       <small>Fig. all 16 upcodes </small>
     </td>
-  <\tr>
+  </tr>
 </table>
 
 **Latency:** 5 clock cycles.
@@ -107,7 +107,7 @@ Reset: **active-low synchronous**. Pipeline state, valid state, and registered o
       <img width="500" height="1025" alt="image" src="https://github.com/user-attachments/assets/ffadcce0-f305-4315-8a81-46cfedb2a533" /><br/>
       <small>Fig. vivado implementation design </small>
     </td>
-  <\tr>
+  </tr>
 </table>
     
 ---
